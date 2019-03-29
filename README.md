@@ -1,12 +1,28 @@
-#Cleans and Analyzes 16S data from Caribean Coral
+## Cleans and Analyzes 16S data from Caribean Coral
 
-###Libraries Used
-dada 2 - infers exact amplicon sequence variants (ASVs) from high-throughput amplicon sequencing data, replacing the coarser and less accurate OTU clustering approach. The dada2 pipeline takes as input demultiplexed fastq files, and outputs the sequence variants and their sample-wise abundances after removing substitution and chimera errors. Taxonomic classification is available via a native implementation of the RDP naive Bayesian classifier, and species-level assignment to 16S rRNA gene fragments by exact matching.
+### Required Packages
+* [dada2](https://bioconductor.org/packages/release/bioc/html/dada2.html)
+* [ShortRead](http://bioconductor.org/packages/release/bioc/html/ShortRead.html) 
+* [ggplot2](https://cran.r-project.org/package=ggplot2)
+* [phyloseq](https://joey711.github.io/phyloseq/) 
+* [vegan](https://cran.r-project.org/package=vegan)
+* [cowplot](https://cran.r-project.org/web/packages/cowplot/index.html)
+* [randomcoloR](https://cran.r-project.org/package=randomcoloR)
+* [knitr](https://github.com/yihui/knitr#readme)
+* [ALDEx2](https://bioconductor.org/packages/release/bioc/html/ALDEx2.html)
+* [CoDaSeq](https://github.com/ggloor/CoDaSeq)
+* [zCompositions](https://cran.r-project.org/package=zCompositions)
+* [igraph](https://igraph.org/r/)
+* [car](https://cran.r-project.org/package=car)
+* [propr](https://cran.r-project.org/package=propr)
+* [dendextend](https://cran.r-project.org/package=dendextend)
+* [tibble](https://tibble.tidyverse.org/)
+* [ggfortify](https://cran.r-project.org/package=ggfortify)
+* [ggbiplot](https://github.com/vqv/ggbiplot)
 
-ShortRead - implements sampling, iteration, and input of FASTQ files. The package includes functions for filtering and trimming reads, and for generating a quality assessment report. Data are represented as DNAStringSet-derived objects, and easily manipulated for a diversity of purposes. The package also contains legacy support for early single-end, ungapped alignment formats.
 
-ggplot2 - data visualization package for the statistical programming language R.
+### Description
 
-phyloseq -tool to import, store, analyze, and graphically display complex phylogenetic sequencing data that has already been clustered into Operational Taxonomic Units (OTUs), especially when there is associated sample data, phylogenetic tree, and/or taxonomic assignment of the OTUs
-
-vegan - package provides tools for descriptive community ecology. It has most basic functions of diversity analysis, community ordination and dissimilarity analysis. Most of its multivariate tools can be used for other data types as well.
+Sequence the data (physical)
+Pull the data from the Hypergator
+DADA2 was used for filtering, error estimation, merging reads, depreplicaiton, removing chimeras, and selection of the amplicon squence variants (ASVs). the SILVA reference data set was used with DADA to perform taxonmy classification, exluding any data that could not be assingned as bacteria or archae. The taxonomy tables are imported into Phyloseq for community analysis based on Count, Taxonomy, and ASVs. The zCompisition package performed the count xzero multiplicative method  to transform zero counts so that  Aitchison distance metric could be calculated with CoDaSeq. Principle component anlysis of the distance was performed with the prcomp package and plotted with ggplot3. Vegan was used to compare the similarities between the distances and communities. Differential ASV abundance within genotype communities was calculated using DESeq2. Red and Green genotype communities were found to be relatively similar and therefor were compared against the yellow communities.
