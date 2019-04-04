@@ -20,6 +20,7 @@
 * [ggfortify](https://cran.r-project.org/package=ggfortify)
 * [ggbiplot](https://github.com/vqv/ggbiplot)
 
+Majority of these packages are part of CRAN
 
 ### Description
 
