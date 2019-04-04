@@ -1,3 +1,4 @@
+source('possibleFunction.R')
 library(dada2)
 library(ShortRead)
 library(ggplot2)
@@ -150,7 +151,9 @@ write.table(metadata,"Acropora_ps5_silva_metadata.txt",sep="\t",col.names=NA)
 
 #Creating Community Composition Bar Charts
 ##### bar charts using ps5 with 81 samples (373 taxa)
-ps = imNotSureWhatThisDoes("Acropora_ps5_silva_nochloronomito_otu_table.txt","Acropora_ps5_silva_nochloronomito_taxa_table.txt","Acropora_ps5_silva_metadata.txt")
+ps = imNotSureWhatThisDoes("Acropora_ps5_silva_nochloronomito_otu_table.txt",
+						   "Acropora_ps5_silva_nochloronomito_taxa_table.txt",
+						   "Acropora_ps5_silva_metadata.txt")
 ps_ra<-transform_sample_counts(ps, function(OTU) OTU/sum(OTU))
 #figure out how many colors you need
 get_taxa_unique(ps_ra, "Class") #27
@@ -215,7 +218,8 @@ n <- 99
 palette <- distinctColorPalette(n)
 #you can rerun the previous line to get a new selection of colors
 p1=plot_bar(ps_ra_G, fill="Order")
-p1+geom_bar(aes(fill=Order), stat="identity",position="stack")+theme(strip.text=element_text(face="bold"))+
+p1+geom_bar(aes(fill=Order), stat="identity",position="stack")+
+ftheme(strip.text=element_text(face="bold"))+
   theme(axis.text.x=element_text(angle = 90))+scale_fill_manual(values=palette)+theme(legend.position = "bottom")+
   facet_grid(.~Colony,scales="free",space="free")
 
