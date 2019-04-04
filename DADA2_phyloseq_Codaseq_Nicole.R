@@ -108,25 +108,9 @@ write.table(seqtab.nochim, "Acropora_silva_otu_table.txt",sep="\t",col.names=NA)
 
 #Removing Mitochondrial and Chloroplast Reads:
 #####read in otu and taxonomy tables from dada2, sample data.
-library(ggplot2)
-library(phyloseq)
-library(vegan)
-otu <- read.table("Acropora_silva_otu_table.txt",sep="\t",header=TRUE, row.names=1)
-taxon <- read.table("Acropora_silva_taxa_table.txt",sep="\t",header=TRUE,row.names=1)
-samples<-read.table("Acropora_metadata.txt",sep="\t",header=T,row.names=1)
-OTU = otu_table(otu, taxa_are_rows=FALSE)
-class(OTU)
-taxa_names(OTU)
-class(taxmat)
-taxon<-as.matrix(taxon)
-TAX = tax_table(taxon)
-taxa_names(TAX)
-sampledata = sample_data(samples)
-ps <- phyloseq(otu_table(otu, taxa_are_rows=FALSE), 
-               sample_data(samples), 
-               tax_table(taxon))
-ps <- prune_samples(sample_names(ps), ps)
-ps
+ps = imNotSureWhatThisDoes("Acropora_silva_otu_table.txt",
+						   "Acropora_silva_taxa_table.txt",
+						   "Acropora_metadata.txt")
 #remove chloroplasts and mitochondria and Eukaryota
 get_taxa_unique(ps, "Family") #559
 get_taxa_unique(ps, "Order") #331
@@ -166,26 +150,7 @@ write.table(metadata,"Acropora_ps5_silva_metadata.txt",sep="\t",col.names=NA)
 
 #Creating Community Composition Bar Charts
 ##### bar charts using ps5 with 81 samples (373 taxa)
-library(phyloseq)
-library(ggplot2)
-library(cowplot)
-library(randomcoloR)
-otu <- read.table("Acropora_ps5_silva_nochloronomito_otu_table.txt",sep="\t",header=TRUE, row.names=1)
-taxon <- read.table("Acropora_ps5_silva_nochloronomito_taxa_table.txt",sep="\t",header=TRUE,row.names=1)
-samples<-read.table("Acropora_ps5_silva_metadata.txt",sep="\t",header=T,row.names=1)
-OTU = otu_table(otu, taxa_are_rows=FALSE)
-class(OTU)
-taxa_names(OTU)
-class(taxmat)
-taxon<-as.matrix(taxon)
-TAX = tax_table(taxon)
-taxa_names(TAX)
-sampledata = sample_data(samples)
-ps <- phyloseq(otu_table(otu, taxa_are_rows=FALSE), 
-               sample_data(samples), 
-               tax_table(taxon))
-ps <- prune_samples(sample_names(ps), ps)
-ps
+ps = imNotSureWhatThisDoes("Acropora_ps5_silva_nochloronomito_otu_table.txt","Acropora_ps5_silva_nochloronomito_taxa_table.txt","Acropora_ps5_silva_metadata.txt")
 ps_ra<-transform_sample_counts(ps, function(OTU) OTU/sum(OTU))
 #figure out how many colors you need
 get_taxa_unique(ps_ra, "Class") #27
@@ -235,26 +200,9 @@ dev.off()
 
 #Bar Plots Individual:
 # bar charts using ps5 with 62 samples (683 taxa)
-library(phyloseq)
-library(ggplot2)
-library(cowplot)
-library(randomcoloR)
-otu <- read.table("Acropora_ps5_silva_nochloronomito_otu_table.txt",sep="\t",header=TRUE, row.names=1)
-taxon <- read.table("Acropora_ps5_silva_nochloronomito_taxa_table.txt",sep="\t",header=TRUE,row.names=1)
-samples<-read.table("Acropora_ps5_silva_metadata.txt",sep="\t",header=T,row.names=1)
-OTU = otu_table(otu, taxa_are_rows=FALSE)
-class(OTU)
-taxa_names(OTU)
-class(taxmat)
-taxon<-as.matrix(taxon)
-TAX = tax_table(taxon)
-taxa_names(TAX)
-sampledata = sample_data(samples)
-ps <- phyloseq(otu_table(otu, taxa_are_rows=FALSE), 
-               sample_data(samples), 
-               tax_table(taxon))
-ps <- prune_samples(sample_names(ps), ps)
-ps
+ps = imNotSureWhatThisDoes("Acropora_ps5_silva_nochloronomito_otu_table.txt",
+						    "Acropora_ps5_silva_nochloronomito_taxa_table.txt",
+						    "Acropora_ps5_silva_metadata.txt")
 ps_ra<-transform_sample_counts(ps, function(OTU) OTU/sum(OTU))
 ps_ra_G = subset_samples(ps_ra, Genotype == "G")
 ps_ra_R = subset_samples(ps_ra, Genotype == "R")
@@ -368,25 +316,9 @@ dev.off()
 ### first get only samples below, adjust otu, taxa, and metadata tables.
 
 ############################################# Green V Red ############################################
-library(ggplot2)
-library(phyloseq)
-library(vegan)
-otu <- read.table("Acropora_ps5_silva_nochloronomito_otu_table.txt",sep="\t",header=TRUE, row.names=1)
-taxon <- read.table("Acropora_ps5_silva_nochloronomito_taxa_table.txt",sep="\t",header=TRUE,row.names=1)
-samples<-read.table("Acropora_metadata_GR.txt",sep="\t",header=T,row.names=1)
-OTU = otu_table(otu, taxa_are_rows=FALSE)
-class(OTU)
-taxa_names(OTU)
-class(taxmat)
-taxon<-as.matrix(taxon)
-TAX = tax_table(taxon)
-taxa_names(TAX)
-sampledata = sample_data(samples)
-ps <- phyloseq(otu_table(otu, taxa_are_rows=FALSE), 
-               sample_data(samples), 
-               tax_table(taxon))
-ps <- prune_samples(sample_names(ps), ps)
-ps
+ps = imNotSureWhatThisDoes(,"Acropora_ps5_silva_nochloronomito_taxa_table.txt",
+							"Acropora_ps5_silva_nochloronomito_otu_table.txt",
+							"Acropora_metadata_GR.txt")
 
 #Subset data into TWO conditions (needed for Deseq)
 ps_GR= subset_samples(ps, Genotype != "Y")
@@ -397,23 +329,9 @@ write.table(otu,"Acropora_silva_nochloronomito_otu_table_Green_Red.txt",sep="\t"
 write.table(taxon,"Acropora_silva_nochloronomito_taxa_table_Green_Red.txt",sep="\t",col.names=NA)
 #use already fixed metadata (new column)
 #clear data and read back in
-otu <- read.table("Acropora_silva_nochloronomito_otu_table_Green_Red.txt",sep="\t",header=TRUE, row.names=1)
-taxon <- read.table("Acropora_silva_nochloronomito_taxa_table_Green_Red.txt",sep="\t",header=TRUE,row.names=1)
-samples<-read.table("Acropora_metadata_Green_Red.txt",sep="\t",header=T,row.names=1)
-OTU = otu_table(otu, taxa_are_rows=FALSE)
-class(OTU)
-taxa_names(OTU)
-class(taxmat)
-taxon<-as.matrix(taxon)
-TAX = tax_table(taxon)
-taxa_names(TAX)
-sampledata = sample_data(samples)
-ps <- phyloseq(otu_table(otu, taxa_are_rows=FALSE), 
-               sample_data(samples), 
-               tax_table(taxon))
-ps <- prune_samples(sample_names(ps), ps)
-ps
-
+ps = imNotSureWhatThisDoes("Acropora_silva_nochloronomito_otu_table_Green_Red.txt",
+						   "Acropora_silva_nochloronomito_taxa_table_Green_Red.txt",
+						   "Acropora_metadata_Green_Red.txt")
 #Define the order of the conditions for testing
 #In this order, the positive fold change values are what increased in the cultures compared to roots
 sample_data(ps)$Genotype<-factor(sample_data(ps)$Genotype,levels=c("G","R"))
@@ -428,11 +346,7 @@ dds
 dds <- dds[ rowSums(counts(dds)) > 5, ]
 dds <- DESeq(dds,test="Wald", fitType="parametric")
 
-#######alternative if getting error cannot compute log geometric means
-#cts <- counts(dds)
-#geoMeans <- apply(cts, 1, function(row) if (all(row == 0)) 0 else exp(mean(log(row[row != 0]))))
-#dds <- estimateSizeFactors(dds, geoMeans=geoMeans)
-#dds <- DESeq(dds,test="Wald", fitType="parametric")
+#######If error check read me
 
 res = results(dds, cooksCutoff = FALSE)
 alpha = 0.01
@@ -465,27 +379,10 @@ pdf(file="DeSeq_Acropora_Green_Red_Genus.pdf",width=8.5)
 ggplot(sigtab, aes(x=Genus, y=log2FoldChange, color=Phylum)) + ggtitle("Green Red") + geom_point(size=4) + coord_flip() +scale_color_manual(values=my20colors)
 dev.off()
 
-
 ############################################# Red Yellow  ############################################
-library(ggplot2)
-library(phyloseq)
-library(vegan)
-otu <- read.table("Acropora_ps5_silva_nochloronomito_otu_table.txt",sep="\t",header=TRUE, row.names=1)
-taxon <- read.table("Acropora_ps5_silva_nochloronomito_taxa_table.txt",sep="\t",header=TRUE,row.names=1)
-samples<-read.table("Acropora_metadata_Red_Yellow.txt",sep="\t",header=T,row.names=1)
-OTU = otu_table(otu, taxa_are_rows=FALSE)
-class(OTU)
-taxa_names(OTU)
-class(taxmat)
-taxon<-as.matrix(taxon)
-TAX = tax_table(taxon)
-taxa_names(TAX)
-sampledata = sample_data(samples)
-ps <- phyloseq(otu_table(otu, taxa_are_rows=FALSE), 
-               sample_data(samples), 
-               tax_table(taxon))
-ps <- prune_samples(sample_names(ps), ps)
-ps
+ps = imNotSureWhatThisDoes("Acropora_ps5_silva_nochloronomito_otu_table.txt",
+						   "Acropora_ps5_silva_nochloronomito_taxa_table.txt",
+						   "Acropora_metadata_Red_Yellow.txt")
 
 #Subset data into TWO conditions (needed for Deseq)
 ps_RY= subset_samples(ps, Genotype != "G")
@@ -496,22 +393,9 @@ write.table(otu,"Acropora_silva_nochloronomito_otu_table_Red_Yellow.txt",sep="\t
 write.table(taxon,"Acropora_silva_nochloronomito_taxa_table_Red_Yellow.txt",sep="\t",col.names=NA)
 #use already fixed metadata (new column)
 #clear data and read back in
-otu <- read.table("Acropora_silva_nochloronomito_otu_table_Red_Yellow.txt",sep="\t",header=TRUE, row.names=1)
-taxon <- read.table("Acropora_silva_nochloronomito_taxa_table_Red_Yellow.txt",sep="\t",header=TRUE,row.names=1)
-samples<-read.table("Acropora_metadata_Red_Yellow.txt",sep="\t",header=T,row.names=1)
-OTU = otu_table(otu, taxa_are_rows=FALSE)
-class(OTU)
-taxa_names(OTU)
-class(taxmat)
-taxon<-as.matrix(taxon)
-TAX = tax_table(taxon)
-taxa_names(TAX)
-sampledata = sample_data(samples)
-ps <- phyloseq(otu_table(otu, taxa_are_rows=FALSE), 
-               sample_data(samples), 
-               tax_table(taxon))
-ps <- prune_samples(sample_names(ps), ps)
-ps
+ps = imNotSureWhatThisDoes("Acropora_silva_nochloronomito_otu_table_Red_Yellow.txt",
+						   "Acropora_silva_nochloronomito_taxa_table_Red_Yellow.txt",
+						   "Acropora_metadata_Red_Yellow.txt")
 
 #Define the order of the conditions for testing
 #In this order, the positive fold change values are what increased in the cultures compared to roots
@@ -527,12 +411,7 @@ dds
 dds <- dds[ rowSums(counts(dds)) > 5, ]
 dds <- DESeq(dds,test="Wald", fitType="parametric")
 
-#######alternative if getting error cannot compute log geometric means
-#cts <- counts(dds)
-#geoMeans <- apply(cts, 1, function(row) if (all(row == 0)) 0 else exp(mean(log(row[row != 0]))))
-#dds <- estimateSizeFactors(dds, geoMeans=geoMeans)
-#dds <- DESeq(dds,test="Wald", fitType="parametric")
-
+#######aif error check README
 res = results(dds, cooksCutoff = FALSE)
 alpha = 0.01
 sigtab = res[which(res$padj < alpha), ]
@@ -564,27 +443,10 @@ pdf(file="DeSeq_Acropora_Red_Yellow_Genus.pdf",width=8.5)
 ggplot(sigtab, aes(x=Genus, y=log2FoldChange, color=Phylum)) + ggtitle("Red Yellow") + geom_point(size=4) + coord_flip() +scale_color_manual(values=my20colors)
 dev.off()
 
-
 ############################################# Green/Red Yellow ############################################
-library(ggplot2)
-library(phyloseq)
-library(vegan)
-otu <- read.table("Acropora_ps5_silva_nochloronomito_otu_table.txt",sep="\t",header=TRUE, row.names=1)
-taxon <- read.table("Acropora_ps5_silva_nochloronomito_taxa_table.txt",sep="\t",header=TRUE,row.names=1)
-samples<-read.table("Acropora_metadata_GR.txt",sep="\t",header=T,row.names=1)
-OTU = otu_table(otu, taxa_are_rows=FALSE)
-class(OTU)
-taxa_names(OTU)
-class(taxmat)
-taxon<-as.matrix(taxon)
-TAX = tax_table(taxon)
-taxa_names(TAX)
-sampledata = sample_data(samples)
-ps <- phyloseq(otu_table(otu, taxa_are_rows=FALSE), 
-               sample_data(samples), 
-               tax_table(taxon))
-ps <- prune_samples(sample_names(ps), ps)
-ps
+ps = imNotSureWhatThisDoes("Acropora_ps5_silva_nochloronomito_otu_table.txt",
+						   "Acropora_ps5_silva_nochloronomito_taxa_table.txt",
+						   "Acropora_metadata_GR.txt")
 #Subset data into TWO conditions (needed for Deseq)
 ps # should be 81 samples
 otu = as(otu_table(ps), "matrix")
@@ -593,23 +455,9 @@ write.table(otu,"Acropora_silva_nochloronomito_otu_table_GreenRed_Yellow.txt",se
 write.table(taxon,"Acropora_silva_nochloronomito_taxa_table_GreenRed_Yellow.txt",sep="\t",col.names=NA)
 #use already fixed metadata (new column)
 #clear data and read back in
-otu <- read.table("Acropora_silva_nochloronomito_otu_table_GreenRed_Yellow.txt",sep="\t",header=TRUE, row.names=1)
-taxon <- read.table("Acropora_silva_nochloronomito_taxa_table_GreenRed_Yellow.txt",sep="\t",header=TRUE,row.names=1)
-samples<-read.table("Acropora_metadata_GR.txt",sep="\t",header=T,row.names=1)
-OTU = otu_table(otu, taxa_are_rows=FALSE)
-class(OTU)
-taxa_names(OTU)
-class(taxmat)
-taxon<-as.matrix(taxon)
-TAX = tax_table(taxon)
-taxa_names(TAX)
-sampledata = sample_data(samples)
-ps <- phyloseq(otu_table(otu, taxa_are_rows=FALSE), 
-               sample_data(samples), 
-               tax_table(taxon))
-ps <- prune_samples(sample_names(ps), ps)
-ps
-
+ps = imNotSureWhatThisDoes("Acropora_silva_nochloronomito_otu_table_GreenRed_Yellow.txt",
+						   "Acropora_silva_nochloronomito_taxa_table_GreenRed_Yellow.txt",
+						   "Acropora_metadata_GR.txt")
 #Define the order of the conditions for testing
 #In this order, the positive fold change values are what increased in the cultures compared to roots
 sample_data(ps)$Geno<-factor(sample_data(ps)$Geno,levels=c("GR","Y"))
@@ -624,11 +472,7 @@ dds
 dds <- dds[ rowSums(counts(dds)) > 5, ]
 dds <- DESeq(dds,test="Wald", fitType="parametric")
 
-#######alternative if getting error cannot compute log geometric means
-#cts <- counts(dds)
-#geoMeans <- apply(cts, 1, function(row) if (all(row == 0)) 0 else exp(mean(log(row[row != 0]))))
-#dds <- estimateSizeFactors(dds, geoMeans=geoMeans)
-#dds <- DESeq(dds,test="Wald", fitType="parametric")
+#######If there is an error check README
 
 res = results(dds, cooksCutoff = FALSE)
 alpha = 0.01
@@ -752,7 +596,6 @@ pdf("Figure4_Acropora_DistanceToCentroid.pdf",width=11,height=11)
 plot(p1)
 dev.off()
 
-
 #Supplementary 
 f <- function(x) {
   ans <- boxplot.stats(x)
@@ -790,6 +633,4 @@ geom_jitter(position=position_jitter(width=.1, height=0),aes(color=Genotype),siz
 pdf("Acropora_Notched_Genotype_DistanceToCentroid.pdf",width=11,height=11)
 plot(p3)
 dev.off()
-
-
 #END#
