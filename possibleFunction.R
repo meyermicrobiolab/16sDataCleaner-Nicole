@@ -1,7 +1,7 @@
 library(phyloseq)
 library(ggplot2)
 library(cowplot)
-imNotSureWhatThisDoes = function (otuTable,taxaTable, metadata){
+imNotSureWhatThisDoes <- function (otuTable,taxaTable, metadata){
 otu <- read.table(otuTable,sep="\t",header=TRUE, row.names=1)
 taxon <- read.table(taxaTable,sep="\t",header=TRUE,row.names=1)
 samples<-read.table(metadata,sep="\t",header=T,row.names=1)
