@@ -1,4 +1,4 @@
-source('possibleFunction.R')
+source('16sDataCleaner-Nicole/possibleFunction.R')
 library(dada2)
 library(ShortRead)
 library(ggplot2)
@@ -8,7 +8,7 @@ library(vegan)
 ####put parsed, adaptors & primers removed, unjoined (R1 and R2 separate) fastq files
 # into directory for DADA2 & make sure the full path is updated in the next line:
 
-path <- "~/Desktop/Nicole/cut files"
+path <- "16sDataCleaner-Nicole/Data"
 list.files(path)
 
 ##dada2 v1.6.0
@@ -88,14 +88,14 @@ head(track)
 write.table(track, "dada_read_stats.txt",sep="\t",col.names=NA)
 
 #####SAVE THIS FILE SO YOU DON'T HAVE TO REPEAT ALL OF THE ABOVE STEPS, adjust name
-saveRDS(seqtab.nochim, file="~/Desktop/Nicole/seqtab.nochim.rds")
+saveRDS(seqtab.nochim, file="16sDataCleaner-Nicole/seqtab.nochim.rds")
 
 # RELOAD THE SAVED INFO FROM HERE (if you have closed the project):
-seqtab.nochim <- readRDS("~/Desktop/Nicole/seqtab.nochim.rds")
+seqtab.nochim <- readRDS("16sDataCleaner-Nicole/seqtab.nochim.rds")
 
 #Assign taxonomy
 #Make sure the appropriate database is available in the DADA2 directory
-taxa <- assignTaxonomy(seqtab.nochim, "~/Desktop/Nicole/silva_nr_v132_train_set.fa.gz", multithread=TRUE)
+taxa <- assignTaxonomy(seqtab.nochim, "16sDataCleaner-Nicole/silva_nr_v132_train_set.fa.gz", multithread=TRUE)
 
 #### FIX the NAs in the taxa table (I'm writing it out here, then reading back in for phyloseq)
 taxon <- as.data.frame(taxa,stringsAsFactors=FALSE)
