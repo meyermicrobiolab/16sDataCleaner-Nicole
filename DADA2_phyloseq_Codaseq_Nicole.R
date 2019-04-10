@@ -112,6 +112,7 @@ write.table(seqtab.nochim, "16sDataCleaner-Nicole/Acropora_silva_otu_table.txt",
 ps = createPsObject("Acropora_silva_otu_table.txt",
 						   "Acropora_silva_taxa_table.txt",
 						   "16sDataCleaner-Nicole/Acropora_metadata.txt")
+ps
 #remove chloroplasts and mitochondria and Eukaryota
 get_taxa_unique(ps, "Family") #559
 get_taxa_unique(ps, "Order") #331
