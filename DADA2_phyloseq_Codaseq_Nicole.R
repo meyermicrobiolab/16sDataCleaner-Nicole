@@ -1,4 +1,4 @@
-source('16sDataCleaner-Nicole/possibleFunction.R')
+source('16sDataCleaner-Nicole/createPS.R')
 library(dada2)
 library(ShortRead)
 library(ggplot2)
@@ -109,7 +109,7 @@ write.table(seqtab.nochim, "Acropora_silva_otu_table.txt",sep="\t",col.names=NA)
 
 #Removing Mitochondrial and Chloroplast Reads:
 #####read in otu and taxonomy tables from dada2, sample data.
-ps = imNotSureWhatThisDoes("Acropora_silva_otu_table.txt",
+ps = createPsObject("Acropora_silva_otu_table.txt",
 						   "Acropora_silva_taxa_table.txt",
 						   "Acropora_metadata.txt")
 #remove chloroplasts and mitochondria and Eukaryota
@@ -151,7 +151,7 @@ write.table(metadata,"Acropora_ps5_silva_metadata.txt",sep="\t",col.names=NA)
 
 #Creating Community Composition Bar Charts
 ##### bar charts using ps5 with 81 samples (373 taxa)
-ps = imNotSureWhatThisDoes("Acropora_ps5_silva_nochloronomito_otu_table.txt",
+ps = createPsObject("Acropora_ps5_silva_nochloronomito_otu_table.txt",
 						   "Acropora_ps5_silva_nochloronomito_taxa_table.txt",
 						   "Acropora_ps5_silva_metadata.txt")
 ps_ra<-transform_sample_counts(ps, function(OTU) OTU/sum(OTU))
@@ -203,7 +203,7 @@ dev.off()
 
 #Bar Plots Individual:
 # bar charts using ps5 with 62 samples (683 taxa)
-ps = imNotSureWhatThisDoes("Acropora_ps5_silva_nochloronomito_otu_table.txt",
+ps = createPsObject("Acropora_ps5_silva_nochloronomito_otu_table.txt",
 						    "Acropora_ps5_silva_nochloronomito_taxa_table.txt",
 						    "Acropora_ps5_silva_metadata.txt")
 ps_ra<-transform_sample_counts(ps, function(OTU) OTU/sum(OTU))
@@ -320,7 +320,7 @@ dev.off()
 ### first get only samples below, adjust otu, taxa, and metadata tables.
 
 ############################################# Green V Red ############################################
-ps = imNotSureWhatThisDoes(,"Acropora_ps5_silva_nochloronomito_taxa_table.txt",
+ps = createPsObject(,"Acropora_ps5_silva_nochloronomito_taxa_table.txt",
 							"Acropora_ps5_silva_nochloronomito_otu_table.txt",
 							"Acropora_metadata_GR.txt")
 
@@ -333,7 +333,7 @@ write.table(otu,"Acropora_silva_nochloronomito_otu_table_Green_Red.txt",sep="\t"
 write.table(taxon,"Acropora_silva_nochloronomito_taxa_table_Green_Red.txt",sep="\t",col.names=NA)
 #use already fixed metadata (new column)
 #clear data and read back in
-ps = imNotSureWhatThisDoes("Acropora_silva_nochloronomito_otu_table_Green_Red.txt",
+ps = createPsObject("Acropora_silva_nochloronomito_otu_table_Green_Red.txt",
 						   "Acropora_silva_nochloronomito_taxa_table_Green_Red.txt",
 						   "Acropora_metadata_Green_Red.txt")
 #Define the order of the conditions for testing
@@ -384,7 +384,7 @@ ggplot(sigtab, aes(x=Genus, y=log2FoldChange, color=Phylum)) + ggtitle("Green Re
 dev.off()
 
 ############################################# Red Yellow  ############################################
-ps = imNotSureWhatThisDoes("Acropora_ps5_silva_nochloronomito_otu_table.txt",
+ps = createPsObject("Acropora_ps5_silva_nochloronomito_otu_table.txt",
 						   "Acropora_ps5_silva_nochloronomito_taxa_table.txt",
 						   "Acropora_metadata_Red_Yellow.txt")
 
@@ -397,7 +397,7 @@ write.table(otu,"Acropora_silva_nochloronomito_otu_table_Red_Yellow.txt",sep="\t
 write.table(taxon,"Acropora_silva_nochloronomito_taxa_table_Red_Yellow.txt",sep="\t",col.names=NA)
 #use already fixed metadata (new column)
 #clear data and read back in
-ps = imNotSureWhatThisDoes("Acropora_silva_nochloronomito_otu_table_Red_Yellow.txt",
+ps = createPsObject("Acropora_silva_nochloronomito_otu_table_Red_Yellow.txt",
 						   "Acropora_silva_nochloronomito_taxa_table_Red_Yellow.txt",
 						   "Acropora_metadata_Red_Yellow.txt")
 
@@ -448,7 +448,7 @@ ggplot(sigtab, aes(x=Genus, y=log2FoldChange, color=Phylum)) + ggtitle("Red Yell
 dev.off()
 
 ############################################# Green/Red Yellow ############################################
-ps = imNotSureWhatThisDoes("Acropora_ps5_silva_nochloronomito_otu_table.txt",
+ps = createPsObject("Acropora_ps5_silva_nochloronomito_otu_table.txt",
 						   "Acropora_ps5_silva_nochloronomito_taxa_table.txt",
 						   "Acropora_metadata_GR.txt")
 #Subset data into TWO conditions (needed for Deseq)
@@ -459,7 +459,7 @@ write.table(otu,"Acropora_silva_nochloronomito_otu_table_GreenRed_Yellow.txt",se
 write.table(taxon,"Acropora_silva_nochloronomito_taxa_table_GreenRed_Yellow.txt",sep="\t",col.names=NA)
 #use already fixed metadata (new column)
 #clear data and read back in
-ps = imNotSureWhatThisDoes("Acropora_silva_nochloronomito_otu_table_GreenRed_Yellow.txt",
+ps = createPsObject("Acropora_silva_nochloronomito_otu_table_GreenRed_Yellow.txt",
 						   "Acropora_silva_nochloronomito_taxa_table_GreenRed_Yellow.txt",
 						   "Acropora_metadata_GR.txt")
 #Define the order of the conditions for testing
