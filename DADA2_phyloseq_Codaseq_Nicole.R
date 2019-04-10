@@ -85,7 +85,7 @@ track <- cbind(out, sapply(dadaFs, getN), sapply(mergers, getN), rowSums(seqtab)
 colnames(track) <- c("input", "filtered", "denoised", "merged", "tabled", "nonchim")
 rownames(track) <- sample.names
 head(track)
-write.table(track, "dada_read_stats.txt",sep="\t",col.names=NA)
+write.table(track, "16sDataCleaner-Nicole/dada_read_stats.txt",sep="\t",col.names=NA)  
 
 #####SAVE THIS FILE SO YOU DON'T HAVE TO REPEAT ALL OF THE ABOVE STEPS, adjust name
 saveRDS(seqtab.nochim, file="16sDataCleaner-Nicole/seqtab.nochim.rds")
@@ -104,14 +104,14 @@ taxon$Class[is.na(taxon$Class)] <- taxon$Phylum[is.na(taxon$Class)]
 taxon$Order[is.na(taxon$Order)] <- taxon$Class[is.na(taxon$Order)]
 taxon$Family[is.na(taxon$Family)] <- taxon$Order[is.na(taxon$Family)]
 taxon$Genus[is.na(taxon$Genus)] <- taxon$Family[is.na(taxon$Genus)]
-write.table(taxon,"Acropora_silva_taxa_table.txt",sep="\t",col.names=NA)
-write.table(seqtab.nochim, "Acropora_silva_otu_table.txt",sep="\t",col.names=NA)
+write.table(taxon,"16sDataCleaner-Nicole/Acropora_silva_taxa_table.txt",sep="\t",col.names=NA)
+write.table(seqtab.nochim, "16sDataCleaner-Nicole/Acropora_silva_otu_table.txt",sep="\t",col.names=NA)
 
 #Removing Mitochondrial and Chloroplast Reads:
 #####read in otu and taxonomy tables from dada2, sample data.
 ps = createPsObject("Acropora_silva_otu_table.txt",
 						   "Acropora_silva_taxa_table.txt",
-						   "Acropora_metadata.txt")
+						   "16sDataCleaner-Nicole/Acropora_metadata.txt")
 #remove chloroplasts and mitochondria and Eukaryota
 get_taxa_unique(ps, "Family") #559
 get_taxa_unique(ps, "Order") #331
@@ -128,8 +128,8 @@ ps2
 otu = as(otu_table(ps2), "matrix")
 taxon = as(tax_table(ps2), "matrix")
 metadata = as(sample_data(ps2), "matrix")
-write.table(otu,"Acropora_silva_nochloronomito_otu_table.txt",sep="\t",col.names=NA)
-write.table(taxon,"Acropora_silva_nochloronomito_taxa_table.txt",sep="\t",col.names=NA)
+write.table(otu,"16sDataCleaner-Nicole/Acropora_silva_nochloronomito_otu_table.txt",sep="\t",col.names=NA)
+write.table(taxon,"16sDataCleaner-Nicole/Acropora_silva_nochloronomito_taxa_table.txt",sep="\t",col.names=NA)
 
 # look at data and chose filtering method for very low abundance ASVs
 ntaxa(ps) #11078
@@ -145,15 +145,15 @@ get_taxa_unique(ps10, "Genus") #93
 otu = as(otu_table(ps5), "matrix")
 taxon = as(tax_table(ps5), "matrix")
 metadata = as(sample_data(ps5), "matrix")
-write.table(otu,"Acropora_ps5_silva_nochloronomito_otu_table.txt",sep="\t",col.names=NA)
-write.table(taxon,"Acropora_ps5_silva_nochloronomito_taxa_table.txt",sep="\t",col.names=NA)
-write.table(metadata,"Acropora_ps5_silva_metadata.txt",sep="\t",col.names=NA)
+write.table(otu,"16sDataCleaner-Nicole/Acropora_ps5_silva_nochloronomito_otu_table.txt",sep="\t",col.names=NA)
+write.table(taxon,"16sDataCleaner-Nicole/Acropora_ps5_silva_nochloronomito_taxa_table.txt",sep="\t",col.names=NA)
+write.table(metadata,"16sDataCleaner-Nicole/Acropora_ps5_silva_metadata.txt",sep="\t",col.names=NA)
 
 #Creating Community Composition Bar Charts
 ##### bar charts using ps5 with 81 samples (373 taxa)
-ps = createPsObject("Acropora_ps5_silva_nochloronomito_otu_table.txt",
-						   "Acropora_ps5_silva_nochloronomito_taxa_table.txt",
-						   "Acropora_ps5_silva_metadata.txt")
+ps = createPsObject("16sDataCleaner-Nicole/Acropora_ps5_silva_nochloronomito_otu_table.txt",
+						   "16sDataCleaner-Nicole/Acropora_ps5_silva_nochloronomito_taxa_table.txt",
+						   "16sDataCleaner-Nicole/Acropora_ps5_silva_metadata.txt")
 ps_ra<-transform_sample_counts(ps, function(OTU) OTU/sum(OTU))
 #figure out how many colors you need
 get_taxa_unique(ps_ra, "Class") #27
@@ -322,20 +322,20 @@ dev.off()
 ############################################# Green V Red ############################################
 ps = createPsObject(,"Acropora_ps5_silva_nochloronomito_taxa_table.txt",
 							"Acropora_ps5_silva_nochloronomito_otu_table.txt",
-							"Acropora_metadata_GR.txt")
+							"16sDataCleaner-Nicole/DeSeqMetadata/Acropora_metadata_GR.txt")
 
 #Subset data into TWO conditions (needed for Deseq)
 ps_GR= subset_samples(ps, Genotype != "Y")
 ps_GR # should be 54 samples
 otu = as(otu_table(ps_GR), "matrix")
 taxon = as(tax_table(ps_GR), "matrix")
-write.table(otu,"Acropora_silva_nochloronomito_otu_table_Green_Red.txt",sep="\t",col.names=NA)
-write.table(taxon,"Acropora_silva_nochloronomito_taxa_table_Green_Red.txt",sep="\t",col.names=NA)
+write.table(otu,"16sDataCleaner-Nicole/Acropora_silva_nochloronomito_otu_table_Green_Red.txt",sep="\t",col.names=NA)
+write.table(taxon,"16sDataCleaner-Nicole/Acropora_silva_nochloronomito_taxa_table_Green_Red.txt",sep="\t",col.names=NA)
 #use already fixed metadata (new column)
 #clear data and read back in
-ps = createPsObject("Acropora_silva_nochloronomito_otu_table_Green_Red.txt",
-						   "Acropora_silva_nochloronomito_taxa_table_Green_Red.txt",
-						   "Acropora_metadata_Green_Red.txt")
+ps = createPsObject("16sDataCleaner-Nicole/Acropora_silva_nochloronomito_otu_table_Green_Red.txt",
+						   "16sDataCleaner-Nicole/Acropora_silva_nochloronomito_taxa_table_Green_Red.txt",
+						   "16sDataCleaner-Nicole/DeSeqMetadata/Acropora_metadata_Green_Red.txt")
 #Define the order of the conditions for testing
 #In this order, the positive fold change values are what increased in the cultures compared to roots
 sample_data(ps)$Genotype<-factor(sample_data(ps)$Genotype,levels=c("G","R"))
@@ -361,9 +361,9 @@ dim(sigtab)
 
 #save table of results
 sig = as(sigtab, "matrix")
-write.table(sig,"DESeq2_results_Green_Red.txt",sep="\t",col.names=NA)
+write.table(sig,"16sDataCleaner-Nicole/DESeq2_results_Green_Red.txt",sep="\t",col.names=NA)
 ##rplot from DESeq2 results
-sigtab<-read.table("DESeq2_results_Green_Red.txt",sep="\t",header=TRUE,row.names=1)
+sigtab<-read.table("16sDataCleaner-Nicole/DESeq2_results_Green_Red.txt",sep="\t",header=TRUE,row.names=1)
 #ggplot2 summary of the results
 library(ggplot2)
 theme_set(theme_bw())
@@ -386,20 +386,20 @@ dev.off()
 ############################################# Red Yellow  ############################################
 ps = createPsObject("Acropora_ps5_silva_nochloronomito_otu_table.txt",
 						   "Acropora_ps5_silva_nochloronomito_taxa_table.txt",
-						   "Acropora_metadata_Red_Yellow.txt")
+						   "16sDataCleaner-Nicole/DeSeqMetadata/Acropora_metadata_Red_Yellow.txt")
 
 #Subset data into TWO conditions (needed for Deseq)
 ps_RY= subset_samples(ps, Genotype != "G")
 ps_RY # should be 54 samples
 otu = as(otu_table(ps_RY), "matrix")
 taxon = as(tax_table(ps_RY), "matrix")
-write.table(otu,"Acropora_silva_nochloronomito_otu_table_Red_Yellow.txt",sep="\t",col.names=NA)
-write.table(taxon,"Acropora_silva_nochloronomito_taxa_table_Red_Yellow.txt",sep="\t",col.names=NA)
+write.table(otu,"16sDataCleaner-Nicole/Acropora_silva_nochloronomito_otu_table_Red_Yellow.txt",sep="\t",col.names=NA)
+write.table(taxon,"16sDataCleaner-Nicole/Acropora_silva_nochloronomito_taxa_table_Red_Yellow.txt",sep="\t",col.names=NA)
 #use already fixed metadata (new column)
 #clear data and read back in
-ps = createPsObject("Acropora_silva_nochloronomito_otu_table_Red_Yellow.txt",
-						   "Acropora_silva_nochloronomito_taxa_table_Red_Yellow.txt",
-						   "Acropora_metadata_Red_Yellow.txt")
+ps = createPsObject("16sDataCleaner-Nicole/Acropora_silva_nochloronomito_otu_table_Red_Yellow.txt",
+						   "16sDataCleaner-Nicole/Acropora_silva_nochloronomito_taxa_table_Red_Yellow.txt",
+						   "16sDataCleaner-Nicole/DeSeqMetadata/Acropora_metadata_Red_Yellow.txt")
 
 #Define the order of the conditions for testing
 #In this order, the positive fold change values are what increased in the cultures compared to roots
@@ -425,9 +425,9 @@ dim(sigtab)
 
 #save table of results
 sig = as(sigtab, "matrix")
-write.table(sig,"DESeq2_results_Red_Yellow.txt",sep="\t",col.names=NA)
+write.table(sig,"16sDataCleaner-Nicole/DESeq2_results_Red_Yellow.txt",sep="\t",col.names=NA)
 ##rplot from DESeq2 results
-sigtab<-read.table("DESeq2_results_Red_Yellow.txt",sep="\t",header=TRUE,row.names=1)
+sigtab<-read.table("16sDataCleaner-Nicole/DESeq2_results_Red_Yellow.txt",sep="\t",header=TRUE,row.names=1)
 #ggplot2 summary of the results
 library(ggplot2)
 theme_set(theme_bw())
@@ -450,18 +450,18 @@ dev.off()
 ############################################# Green/Red Yellow ############################################
 ps = createPsObject("Acropora_ps5_silva_nochloronomito_otu_table.txt",
 						   "Acropora_ps5_silva_nochloronomito_taxa_table.txt",
-						   "Acropora_metadata_GR.txt")
+						   "16sDataCleaner-Nicole/DeSeqMetadata/Acropora_metadata_GR.txt")
 #Subset data into TWO conditions (needed for Deseq)
 ps # should be 81 samples
 otu = as(otu_table(ps), "matrix")
 taxon = as(tax_table(ps), "matrix")
-write.table(otu,"Acropora_silva_nochloronomito_otu_table_GreenRed_Yellow.txt",sep="\t",col.names=NA)
-write.table(taxon,"Acropora_silva_nochloronomito_taxa_table_GreenRed_Yellow.txt",sep="\t",col.names=NA)
+write.table(otu,"16sDataCleaner-Nicole/Acropora_silva_nochloronomito_otu_table_GreenRed_Yellow.txt",sep="\t",col.names=NA)
+write.table(taxon,"16sDataCleaner-Nicole/Acropora_silva_nochloronomito_taxa_table_GreenRed_Yellow.txt",sep="\t",col.names=NA)
 #use already fixed metadata (new column)
 #clear data and read back in
-ps = createPsObject("Acropora_silva_nochloronomito_otu_table_GreenRed_Yellow.txt",
-						   "Acropora_silva_nochloronomito_taxa_table_GreenRed_Yellow.txt",
-						   "Acropora_metadata_GR.txt")
+ps = createPsObject("16sDataCleaner-Nicole/Acropora_silva_nochloronomito_otu_table_GreenRed_Yellow.txt",
+						   "16sDataCleaner-Nicole/Acropora_silva_nochloronomito_taxa_table_GreenRed_Yellow.txt",
+						   "16sDataCleaner-Nicole/DeSeqMetadata/Acropora_metadata_GR.txt")
 #Define the order of the conditions for testing
 #In this order, the positive fold change values are what increased in the cultures compared to roots
 sample_data(ps)$Geno<-factor(sample_data(ps)$Geno,levels=c("GR","Y"))
@@ -487,9 +487,9 @@ dim(sigtab)
 
 #save table of results
 sig = as(sigtab, "matrix")
-write.table(sig,"DESeq2_results_GreenRed_Yellow.txt",sep="\t",col.names=NA)
+write.table(sig,"16sDataCleaner-Nicole/DESeq2_results_GreenRed_Yellow.txt",sep="\t",col.names=NA)
 ##rplot from DESeq2 results
-sigtab<-read.table("DESeq2_results_GreenRed_Yellow.txt",sep="\t",header=TRUE,row.names=1)
+sigtab<-read.table("16sDataCleaner-Nicole/DESeq2_results_GreenRed_Yellow.txt",sep="\t",header=TRUE,row.names=1)
 #ggplot2 summary of the results
 library(ggplot2)
 theme_set(theme_bw())
