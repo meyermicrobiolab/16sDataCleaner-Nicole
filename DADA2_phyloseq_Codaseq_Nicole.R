@@ -199,7 +199,7 @@ p3=plot_bar(ps_ra_yellow, fill="Order")+
   theme(legend.position = "none")
 
 ####adjust width and height until it looks right for double columns
-pdf("16sDataCleaner-Nicole/Acropora_BarCharts_Order_forthelegend.pdf",width=24, height=10)
+pdf("16sDataCleaner-Nicole/Results/Acropora_BarCharts_Order_forthelegend.pdf",width=24, height=10)
 plot_grid(p1,p2,p3,labels=c("A","B","C"), ncol=2, nrow=2)
 dev.off()
 dev.off()
@@ -285,7 +285,7 @@ screeplot(d.pcx)
 ##### replot PCA with ggplot2 (showing samples only)
 df_out <- as.data.frame(d.pcx$x)
 theme_set(theme_bw()+theme(panel.grid.major = element_blank(),panel.grid.minor = element_blank()))
-pdf("16sDataCleaner-Nicole/Acropora_PCA_Genotype_Branch.pdf",width=8.5)
+pdf("16sDataCleaner-Nicole/Results/Acropora_PCA_Genotype_Branch.pdf",width=8.5)
 p<-ggplot(df_out,aes(x=PC1,y=PC2,color=samples$Genotype,shape=samples$Branch))
 p<-p+geom_point(size=3)+theme(axis.title = element_text(size=14))+theme(axis.text=element_text(size=12))+
   theme(legend.title = element_text(size=14))+theme(legend.text = element_text(size=12))+
@@ -305,17 +305,17 @@ ano <- anosim(dist.clr, conds, permutations=999)
 plot(ano)
 
 ano <- anosim(dist.clr, site, permutations=999)
-png("16sDataCleaner-Nicole/Acropora_ANOSIM_Branch.pdf")
+png("16sDataCleaner-Nicole/Results/Acropora_ANOSIM_Branch.pdf")
 plot(ano)
 dev.off()
 
 ano <- anosim(dist.clr,conds, permutations=999)
-pdf("16sDataCleaner-Nicole/Acropora_ANOSIM_Genotype.pdf",width=8.5)
+pdf("16sDataCleaner-Nicole/Results/Acropora_ANOSIM_Genotype.pdf",width=8.5)
 plot(ano)
 dev.off()
 
 ano <- anosim(dist.clr, coral, permutations=999)
-pdf("16sDataCleaner-Nicole/Acropora_ANOSIM_Colony.pdf",width=8.5)
+pdf("16sDataCleaner-Nicole/Results/Acropora_ANOSIM_Colony.pdf",width=8.5)
 plot(ano)
 dev.off()
 
@@ -377,14 +377,14 @@ my20colors<-c("#c26162","#d689c2","#d64142","#6db643","#9c58cb","#cdab39","#626f
 x = tapply(sigtab$log2FoldChange, sigtab$Phylum, function(x) max(x))
 x = sort(x, TRUE)
 sigtab$Phylum = factor(as.character(sigtab$Phylum), levels=names(x))
-pdf(file="16sDataCleaner-Nicole/DESeq_Acropora_Green_Red_Phylum.pdf",width=8.5)
+pdf(file="16sDataCleaner-Nicole/Results/DESeq_Acropora_Green_Red_Phylum.pdf",width=8.5)
 ggplot(sigtab, aes(x=Phylum, y=log2FoldChange, color=Phylum)) + ggtitle("Green Red") + geom_point(size=4) + coord_flip() +scale_color_manual(values=my20colors)
 dev.off()
 # Genus order
 x2 = tapply(sigtab$log2FoldChange, sigtab$Genus, function(x2) max(x2))
 x2 = sort(x2, TRUE)
 sigtab$Genus = factor(as.character(sigtab$Genus), levels=names(x2))
-pdf(file="16sDataCleaner-Nicole/DeSeq_Acropora_Green_Red_Genus.pdf",width=8.5)
+pdf(file="16sDataCleaner-Nicole/Results/DeSeq_Acropora_Green_Red_Genus.pdf",width=8.5)
 ggplot(sigtab, aes(x=Genus, y=log2FoldChange, color=Phylum)) + ggtitle("Green Red") + geom_point(size=4) + coord_flip() +scale_color_manual(values=my20colors)
 dev.off()
 
@@ -441,14 +441,14 @@ my20colors<-c("#c26162","#d689c2","#d64142","#6db643","#9c58cb","#cdab39","#626f
 x = tapply(sigtab$log2FoldChange, sigtab$Phylum, function(x) max(x))
 x = sort(x, TRUE)
 sigtab$Phylum = factor(as.character(sigtab$Phylum), levels=names(x))
-pdf(file="16sDataCleaner-Nicole/DESeq_Acropora_Red_Yellow_Phylum.pdf",width=8.5)
+pdf(file="16sDataCleaner-Nicole/Results/DESeq_Acropora_Red_Yellow_Phylum.pdf",width=8.5)
 ggplot(sigtab, aes(x=Phylum, y=log2FoldChange, color=Phylum)) + ggtitle("Red Yellow") + geom_point(size=4) + coord_flip() +scale_color_manual(values=my20colors)
 dev.off()
 # Genus order
 x2 = tapply(sigtab$log2FoldChange, sigtab$Genus, function(x2) max(x2))
 x2 = sort(x2, TRUE)
 sigtab$Genus = factor(as.character(sigtab$Genus), levels=names(x2))
-pdf(file="16sDataCleaner-Nicole/DeSeq_Acropora_Red_Yellow_Genus.pdf",width=8.5)
+pdf(file="16sDataCleaner-Nicole/Results/DeSeq_Acropora_Red_Yellow_Genus.pdf",width=8.5)
 ggplot(sigtab, aes(x=Genus, y=log2FoldChange, color=Phylum)) + ggtitle("Red Yellow") + geom_point(size=4) + coord_flip() +scale_color_manual(values=my20colors)
 dev.off()
 
@@ -503,14 +503,14 @@ my20colors<-c("#c26162","#d689c2","#d64142","#6db643","#9c58cb","#cdab39","#626f
 x = tapply(sigtab$log2FoldChange, sigtab$Phylum, function(x) max(x))
 x = sort(x, TRUE)
 sigtab$Phylum = factor(as.character(sigtab$Phylum), levels=names(x))
-pdf(file="16sDataCleaner-Nicole/DESeq_Acropora_GreenRed_Yellow_Phylum.pdf",width=8.5)
+pdf(file="16sDataCleaner-Nicole/Results/DESeq_Acropora_GreenRed_Yellow_Phylum.pdf",width=8.5)
 ggplot(sigtab, aes(x=Phylum, y=log2FoldChange, color=Phylum)) + ggtitle("Green&Red Yellow") + geom_point(size=4) + coord_flip() +scale_color_manual(values=my20colors)
 dev.off()
 # Genus order
 x2 = tapply(sigtab$log2FoldChange, sigtab$Genus, function(x2) max(x2))
 x2 = sort(x2, TRUE)
 sigtab$Genus = factor(as.character(sigtab$Genus), levels=names(x2))
-pdf(file="16sDataCleaner-Nicole/DeSeq_Acropora_GreenRed_Yellow_Genus.pdf",width=8.5)
+pdf(file="16sDataCleaner-Nicole/Results/DeSeq_Acropora_GreenRed_Yellow_Genus.pdf",width=8.5)
 ggplot(sigtab, aes(x=Genus, y=log2FoldChange, color=Phylum)) + xlab("Genera") + geom_point(size=4) + coord_flip() +scale_color_manual(values= c("#33CCCC","mediumpurple1","deeppink4")) +geom_abline(m = 0, color = "red", slope = 0)
 dev.off()
 
@@ -601,7 +601,7 @@ p1<-ggplot(dis.treat, aes(x=Colony,y=distance))+
   theme(legend.text=element_text(face="italic"))+
   theme(text=element_text(size=16))+
   ylab("Distance to Centroid")
-pdf("16sDataCleaner-Nicole/Figure4_Acropora_DistanceToCentroid.pdf",width=11,height=11)
+pdf("16sDataCleaner-Nicole/Results/Figure4_Acropora_DistanceToCentroid.pdf",width=11,height=11)
 plot(p1)
 dev.off()
 
@@ -623,7 +623,7 @@ geom_jitter(position=position_jitter(width=.1, height=0),aes(color=Genotype),siz
   theme(legend.text=element_text(face="italic"))+
   theme(text=element_text(size=16))+
   ylab("Distance to Centroid")
-pdf("16sDataCleaner-Nicole/Acropora_Notched_Colony_DistanceToCentroid.pdf",width=11,height=11)
+pdf("16sDataCleaner-Nicole/Results/Acropora_Notched_Colony_DistanceToCentroid.pdf",width=11,height=11)
 plot(p2)
 dev.off()
 
@@ -639,7 +639,7 @@ geom_jitter(position=position_jitter(width=.1, height=0),aes(color=Genotype),siz
   theme(legend.text=element_text(face="italic"))+
   theme(text=element_text(size=16))+
   ylab("Distance to Centroid")
-pdf("16sDataCleaner-Nicole/Acropora_Notched_Genotype_DistanceToCentroid.pdf",width=11,height=11)
+pdf("16sDataCleaner-Nicole/Results/Acropora_Notched_Genotype_DistanceToCentroid.pdf",width=11,height=11)
 plot(p3)
 dev.off()
 #END#
