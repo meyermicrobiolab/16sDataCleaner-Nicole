@@ -6,6 +6,8 @@ library(phyloseq)
 library(vegan)
 library(randomcoloR)
 
+try(dir.create("/16sDataCleaner-Nicole/Results"))#Add file for figures and results to be added to for organizational purposes
+
 ####put parsed, adaptors & primers removed, unjoined (R1 and R2 separate) fastq files
 # into directory for DADA2 & make sure the full path is updated in the next line:
 
