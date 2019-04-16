@@ -8,24 +8,22 @@ library(randomcoloR)
 
 try(dir.create("/16sDataCleaner-Nicole/Results"))#Add file for figures and results to be added to for organizational purposes
 
-####put parsed, adaptors & primers removed, unjoined (R1 and R2 separate) fastq files
-# into directory for DADA2 & make sure the full path is updated in the next line:
+
+
+#######################FILTERING THE DATA###################################################################
 
 path <- "16sDataCleaner-Nicole/Data"
 list.files(path)
 
-##dada2 v1.6.0
-
 # Samplename is everything before the first underscore
 fnFs <- sort(list.files(path, pattern="_R1_cut.fastq.gz", full.names = TRUE))
 fnRs <- sort(list.files(path, pattern="_R2_cut.fastq.gz", full.names = TRUE))
+
 # Extract sample names, assuming filenames have format: SAMPLENAME_XXX.fastq
 sample.names <- sapply(strsplit(basename(fnFs), "_"), `[`, 1)
 
 ##Examine quality profiles of forward and reverse reads
 plotQualityProfile(fnFs[1:6])
-#fixediterror#
-^#plotQualityProfile(fnRs[1:6]) #Error from cutadapt (sequences with length 0) fix @ http://cutadapt.readthedocs.io/en/stable/guide.html#filtering-reads with parameter --minimum-length N
 
 #Perform filtering and trimming
 #Assign the filenames for the filtered fastq.gz files.
@@ -35,12 +33,13 @@ filtFs <- file.path(filt_path, paste0(sample.names, "_F_filt.fastq.gz"))
 filtRs <- file.path(filt_path, paste0(sample.names, "_R_filt.fastq.gz"))
 
 # Filter the forward and reverse reads
+#WINDOWS USERS: set multithread=FALSE
 out <- filterAndTrim(fnFs, filtFs, fnRs, filtRs, truncLen=c(150,150),
               maxN=0, maxEE=c(2,2), truncQ=2, rm.phix=TRUE,
-              compress=TRUE, multithread=TRUE) # On Windows set multithread=FALSE
+              compress=TRUE, multithread=TRUE) 
 head(out)
 
-#Learn the Error Rates, it TAKES TIME! do first forward and then reverse
+#Learn the Error Rates (this takes time)
 # Forward reads
 errF <- learnErrors(filtFs, multithread=TRUE)
 # Reverse reads
@@ -68,8 +67,8 @@ mergers <- mergePairs(dadaFs, derepFs, dadaRs, derepRs, verbose=TRUE)
 # Inspect the merger data.frame from the first sample
 head(mergers[[1]])
 
-#Construct sequence table
-seqtab <- makeSequenceTable(mergers) ## The sequences being tabled vary in length.
+#Construct sequence table, te sequences vary in length.
+seqtab <- makeSequenceTable(mergers)
 dim(seqtab)
 
 # Inspect distribution of sequence lengths
@@ -84,7 +83,6 @@ sum(seqtab.nochim)/sum(seqtab)
 #As a final check of our progress, we’ll look at the number of reads that made it through each step in the pipeline
 getN <- function(x) sum(getUniques(x))
 track <- cbind(out, sapply(dadaFs, getN), sapply(mergers, getN), rowSums(seqtab), rowSums(seqtab.nochim))
-# If processing a single sample, remove the sapply calls: e.g. replace sapply(dadaFs, getN) with getN(dadaFs)
 colnames(track) <- c("input", "filtered", "denoised", "merged", "tabled", "nonchim")
 rownames(track) <- sample.names
 head(track)
@@ -93,10 +91,12 @@ write.table(track, "16sDataCleaner-Nicole/dada_read_stats.txt",sep="\t",col.name
 #####SAVE THIS FILE SO YOU DON'T HAVE TO REPEAT ALL OF THE ABOVE STEPS, adjust name
 saveRDS(seqtab.nochim, file="16sDataCleaner-Nicole/seqtab.nochim.rds")
 
+
+
+######################ASSIGNING THE TAXONOMY###############################################################################
 # RELOAD THE SAVED INFO FROM HERE (if you have closed the project):
 seqtab.nochim <- readRDS("16sDataCleaner-Nicole/seqtab.nochim.rds")
 
-#Assign taxonomy
 #Make sure the appropriate database is available in the DADA2 directory
 taxa <- assignTaxonomy(seqtab.nochim, "16sDataCleaner-Nicole/silva_nr_v132_train_set.fa.gz", multithread=TRUE)
 
@@ -110,7 +110,7 @@ taxon$Genus[is.na(taxon$Genus)] <- taxon$Family[is.na(taxon$Genus)]
 write.table(taxon,"16sDataCleaner-Nicole/Acropora_silva_taxa_table.txt",sep="\t",col.names=NA)
 write.table(seqtab.nochim, "16sDataCleaner-Nicole/Acropora_silva_otu_table.txt",sep="\t",col.names=NA)
 
-#Removing Mitochondrial and Chloroplast Reads:
+#####################REMOVING MITOCHONDIRAL AND CHLOROPLAST READS############################################################
 #####read in otu and taxonomy tables from dada2, sample data.
 ps = createPsObject("Acropora_silva_otu_table.txt",
 						   "Acropora_silva_taxa_table.txt",
@@ -128,14 +128,15 @@ get_taxa_unique(ps2, "Family") #555
 get_taxa_unique(ps2, "Order") #327
 get_taxa_unique(ps2, "Kingdom") #2
 ps2
-# filtered taxa with phyloseq, now export otu and taxa tables from phyloseq
+
+# Export otu and taxa tables from phyloseq
 otu = as(otu_table(ps2), "matrix")
 taxon = as(tax_table(ps2), "matrix")
 metadata = as(sample_data(ps2), "matrix")
 write.table(otu,"16sDataCleaner-Nicole/Acropora_silva_nochloronomito_otu_table.txt",sep="\t",col.names=NA)
 write.table(taxon,"16sDataCleaner-Nicole/Acropora_silva_nochloronomito_taxa_table.txt",sep="\t",col.names=NA)
 
-# look at data and chose filtering method for very low abundance ASVs
+# Chose filtering method for very low abundance ASVs
 ntaxa(ps) #11078
 ps10<-filter_taxa(ps, function(x) mean(x) >10, TRUE)
 ntaxa(ps10) #265
@@ -145,7 +146,7 @@ get_taxa_unique(ps, "Genus") # 1096
 get_taxa_unique(ps5, "Genus") #139
 get_taxa_unique(ps10, "Genus") #93
 
-# filtered ASVs with very low abundance with phyloseq, now export otu and taxa tables from phyloseq for codaseq
+# Export otu and taxa tables from phyloseq for codaseq
 otu = as(otu_table(ps5), "matrix")
 taxon = as(tax_table(ps5), "matrix")
 metadata = as(sample_data(ps5), "matrix")
@@ -153,8 +154,10 @@ write.table(otu,"16sDataCleaner-Nicole/Acropora_ps5_silva_nochloronomito_otu_tab
 write.table(taxon,"16sDataCleaner-Nicole/Acropora_ps5_silva_nochloronomito_taxa_table.txt",sep="\t",col.names=NA)
 write.table(metadata,"16sDataCleaner-Nicole/Acropora_ps5_silva_metadata.txt",sep="\t",col.names=NA)
 
-#Creating Community Composition Bar Charts
-##### bar charts using ps5 with 81 samples (373 taxa)
+
+######################CREATING COMMUNITY COMPOSITION BAR CHARTS##########################################################
+
+#bar charts using ps5 with 81 samples (373 taxa)
 ps = createPsObject("16sDataCleaner-Nicole/Acropora_ps5_silva_nochloronomito_otu_table.txt",
 						   "16sDataCleaner-Nicole/Acropora_ps5_silva_nochloronomito_taxa_table.txt",
 						   "16sDataCleaner-Nicole/Acropora_ps5_silva_metadata.txt")
@@ -165,9 +168,10 @@ get_taxa_unique(ps_ra, "Order") #65
 get_taxa_unique(ps_ra, "Genus") #139
 
 #you can make n any number of colors you want; with as much difference between the colors as possible (distinct colors)
+#you can rerun to get a new selection of colors
 n <- 64
 palette <- distinctColorPalette(n)
-#you can rerun the previous line to get a new selection of colors
+
 
 ps_ra_red = subset_samples(ps_ra, Genotype == "R")
 ps_ra_green = subset_samples(ps_ra, Genotype == "G")
@@ -200,13 +204,15 @@ p3=plot_bar(ps_ra_yellow, fill="Order")+
   theme(axis.title.x = element_blank())+
   theme(legend.position = "none")
 
-####adjust width and height until it looks right for double columns
+#adjust width and height for double columns
 pdf("16sDataCleaner-Nicole/Results/Acropora_BarCharts_Order_forthelegend.pdf",width=24, height=10)
 plot_grid(p1,p2,p3,labels=c("A","B","C"), ncol=2, nrow=2)
 dev.off()
 dev.off()
 
-#Bar Plots Individual:
+
+###################################### INDIVIDUAL BAR PLOTS ################################################
+#Same technique as above
 # bar charts using ps5 with 62 samples (683 taxa)
 ps = createPsObject("Acropora_ps5_silva_nochloronomito_otu_table.txt",
 						    "Acropora_ps5_silva_nochloronomito_taxa_table.txt",
@@ -215,14 +221,13 @@ ps_ra<-transform_sample_counts(ps, function(OTU) OTU/sum(OTU))
 ps_ra_G = subset_samples(ps_ra, Genotype == "G")
 ps_ra_R = subset_samples(ps_ra, Genotype == "R")
 ps_ra_Y = subset_samples(ps_ra, Genotype == "Y")
-#figure out how many colors you need
+
 get_taxa_unique(ps_ra, "Order") #65
 get_taxa_unique(ps_ra, "Class") #27
-#you can make n any number of colors you want; with as much difference between the colors as possible (distinct colors)
+
 n <- 99
 palette <- distinctColorPalette(n)
-#you can rerun the previous line to get a new selection of colors
-#######PLOTS NOT SHOWING#########
+
 p1=plot_bar(ps_ra_G, fill="Order")
 p1+geom_bar(aes(fill=Order), stat="identity",position="stack")+
 ftheme(strip.text=element_text(face="bold"))+
@@ -239,7 +244,7 @@ p3+geom_bar(aes(fill=Order), stat="identity",position="stack")+theme(strip.text=
   theme(axis.text.x=element_text(angle = 90))+scale_fill_manual(values=palette)+theme(legend.position = "bottom")+
   facet_grid(.~Colony,scales="free",space="free")
 
-#PCA Analysis and ANOSIM
+########################## PCA ANALYSIS AND ANOSIM ###########################################
 #Microbiome Datasets are Compositional: and this is not optional
 #Gloor et al 2017 & other ggloor papers and codes on github (CoDA microbiome tutorial)
 library(knitr)
@@ -255,7 +260,7 @@ library(dendextend)
 library(tibble)
 library(ggfortify)
 library(ggbiplot)
-#sessionInfo()
+
 
 #### READ IN ***FILTERED***, cleaned DADA2 OTU TABLE (chloroplasts and mitochondria removed) and taxonomy table
 otu <- read.table("16sDataCleaner-Nicole/Acropora_ps5_silva_nochloronomito_otu_table.txt",sep="\t",header=TRUE, row.names=1)
@@ -263,10 +268,8 @@ taxon <- read.table("16sDataCleaner-Nicole/Acropora_ps5_silva_nochloronomito_tax
 samples<-read.table("16sDataCleaner-Nicole/Acropora_ps5_silva_metadata.txt",sep="\t",header=T,row.names=1)
 genus<-as.character(taxon$Genus)
 
-# First, replace 0 values with an estimate (because normalization is taking log, can't have 0)
-# Also transposing here, need samples as rows
-# First, replace 0 values with an estimate (because normalization is taking log, can't have 0)
-# Also transposing here, need samples as rows
+# Replace 0 values with an estimate (normalization takes log, can't have 0)
+# Transposing beacuse we need samples as rows
 d.czm <- cmultRepl(t(otu), method="CZM", label=0)
 # Perform the center-log-ratio (CLR) transformation 
 d.clr <- codaSeq.clr(d.czm)
@@ -322,18 +325,16 @@ plot(ano)
 dev.off()
 
 
-####DeSeq#####
-###################### Differential abundance
-### first get only samples below, adjust otu, taxa, and metadata tables.
-
-############################################# Green V Red ############################################
+##################################### DESEQ: DIFFERENTIAL ABUNDANCE #####################################################################################
+library(ggplot2)
+###################### Green V Red #######################
 ps = createPsObject("Acropora_ps5_silva_nochloronomito_otu_table.txt",
                     "Acropora_ps5_silva_nochloronomito_taxa_table.txt",
 							      "16sDataCleaner-Nicole/DeSeq Data/Acropora_metadata_GR.txt")
 
 #Subset data into TWO conditions (needed for Deseq)
 ps_GR= subset_samples(ps, Genotype != "Y")
-ps_GR # should be 54 samples
+ps_GR #54 samples
 otu = as(otu_table(ps_GR), "matrix")
 taxon = as(tax_table(ps_GR), "matrix")
 write.table(otu,"16sDataCleaner-Nicole/DeSeq Data/Acropora_silva_nochloronomito_otu_table_Green_Red.txt",sep="\t",col.names=NA)
@@ -371,8 +372,8 @@ sig = as(sigtab, "matrix")
 write.table(sig,"16sDataCleaner-Nicole/DeSeq Data/DESeq2_results_Green_Red.txt",sep="\t",col.names=NA)
 ##rplot from DESeq2 results
 sigtab<-read.table("16sDataCleaner-Nicole/DeSeq Data/DESeq2_results_Green_Red.txt",sep="\t",header=TRUE,row.names=1)
-#ggplot2 summary of the results
-library(ggplot2)
+
+#Plot summary of results
 theme_set(theme_bw())
 my20colors<-c("#c26162","#d689c2","#d64142","#6db643","#9c58cb","#cdab39","#626fdf","#5cba78","#bd3fa0","#497535","#de76dd","#949345","#6e58a2","#cd6529","#46aed7","#d94681","#49b39c","#9e4e77","#bd814c","#798fd5")
 # Phylum order
@@ -390,14 +391,14 @@ pdf(file="16sDataCleaner-Nicole/Results/DeSeq_Acropora_Green_Red_Genus.pdf",widt
 ggplot(sigtab, aes(x=Genus, y=log2FoldChange, color=Phylum)) + ggtitle("Green Red") + geom_point(size=4) + coord_flip() +scale_color_manual(values=my20colors)
 dev.off()
 
-############################################# Red Yellow  ############################################
+############################### Red Yellow  #####################################
 ps = createPsObject("16sDataCleaner-Nicole/Acropora_ps5_silva_nochloronomito_otu_table.txt",
 						   "16sDataCleaner-Nicole/Acropora_ps5_silva_nochloronomito_taxa_table.txt",
 						   "16sDataCleaner-Nicole/DeSeq Data/Acropora_metadata_Red_Yellow.txt")
 
 #Subset data into TWO conditions (needed for Deseq)
 ps_RY= subset_samples(ps, Genotype != "G")
-ps_RY # should be 54 samples
+ps_RY # 54 samples
 otu = as(otu_table(ps_RY), "matrix")
 taxon = as(tax_table(ps_RY), "matrix")
 write.table(otu,"16sDataCleaner-Nicole/DeSeq Data/Acropora_silva_nochloronomito_otu_table_Red_Yellow.txt",sep="\t",col.names=NA)
@@ -435,8 +436,7 @@ sig = as(sigtab, "matrix")
 write.table(sig,"16sDataCleaner-Nicole/DeSeq Data/DESeq2_results_Red_Yellow.txt",sep="\t",col.names=NA)
 ##rplot from DESeq2 results
 sigtab<-read.table("16sDataCleaner-Nicole/DeSeq Data/DESeq2_results_Red_Yellow.txt",sep="\t",header=TRUE,row.names=1)
-#ggplot2 summary of the results
-library(ggplot2)
+
 theme_set(theme_bw())
 my20colors<-c("#c26162","#d689c2","#d64142","#6db643","#9c58cb","#cdab39","#626fdf","#5cba78","#bd3fa0","#497535","#de76dd","#949345","#6e58a2","#cd6529","#46aed7","#d94681","#49b39c","#9e4e77","#bd814c","#798fd5")
 # Phylum order
@@ -454,7 +454,7 @@ pdf(file="16sDataCleaner-Nicole/Results/DeSeq_Acropora_Red_Yellow_Genus.pdf",wid
 ggplot(sigtab, aes(x=Genus, y=log2FoldChange, color=Phylum)) + ggtitle("Red Yellow") + geom_point(size=4) + coord_flip() +scale_color_manual(values=my20colors)
 dev.off()
 
-############################################# Green/Red Yellow ############################################
+################################ Green/Red Yellow ###########################
 print("should be 81 samples in the ps object, check the output")
 ps = createPsObject("16sDataCleaner-Nicole/Acropora_ps5_silva_nochloronomito_otu_table.txt",
 						   "16sDataCleaner-Nicole/Acropora_ps5_silva_nochloronomito_taxa_table.txt",
@@ -497,8 +497,7 @@ sig = as(sigtab, "matrix")
 write.table(sig,"16sDataCleaner-Nicole/DESeq2_results_GreenRed_Yellow.txt",sep="\t",col.names=NA)
 ##rplot from DESeq2 results
 sigtab<-read.table("16sDataCleaner-Nicole/DESeq2_results_GreenRed_Yellow.txt",sep="\t",header=TRUE,row.names=1)
-#ggplot2 summary of the results
-library(ggplot2)
+
 theme_set(theme_bw())
 my20colors<-c("#c26162","#d689c2","#d64142","#6db643","#9c58cb","#cdab39","#626fdf","#5cba78","#bd3fa0","#497535","#de76dd","#949345","#6e58a2","#cd6529","#46aed7","#d94681","#49b39c","#9e4e77","#bd814c","#798fd5")
 # Phylum order
@@ -522,7 +521,7 @@ with(res[topGene, ], {
   text(baseMean, log2FoldChange, topGene, pos=2, col="dodgerblue")
 })
 
-#Distance to Centroid
+#####################################DISTANCE TO CENTROID ######################################################
 #Microbiome Datasets are Compositional: and this is not optional
 #Gloor et al 2017 & other ggloor papers and codes on github (CoDA microbiome tutorial)
 library(knitr)
@@ -545,7 +544,7 @@ taxon <- read.table("16sDataCleaner-Nicole/Acropora_ps5_silva_nochloronomito_tax
 samples<-read.table("16sDataCleaner-Nicole/Acropora_ps5_silva_metadata.txt",sep="\t",header=T,row.names=1)
 genus<-as.character(taxon$Genus)
 
-# First, replace 0 values with an estimate (because normalization is taking log, can't have 0)
+# Replace 0 values with an estimate (normalization takes log, can't have 0)
 # Also transposing here, need samples as rows
 d.czm <- cmultRepl(t(otu), method="CZM", label=0)
 # Perform the center-log-ratio (CLR) transformation 
@@ -568,10 +567,9 @@ anova(mod)
 plot(mod)
 boxplot(mod)
 
-## Compute mean distance to centroid per group
-#this just prints values on the console
+## Compute mean distance to centroid per group this just prints values on the console
 tapply(mod$distances, conds, mean)
-## Same, but variance instead
+## variance
 tapply(mod$distances, conds, var)
 
 #Get the distances to centroid from the model
@@ -607,7 +605,7 @@ pdf("16sDataCleaner-Nicole/Results/Figure4_Acropora_DistanceToCentroid.pdf",widt
 plot(p1)
 dev.off()
 
-#Supplementary 
+######################### SUPPLEMENTARY ###########################################
 f <- function(x) {
   ans <- boxplot.stats(x)
   data.frame(ymin = ans$conf[1], ymax = ans$conf[2], y = ans$stats[3])
@@ -644,4 +642,4 @@ geom_jitter(position=position_jitter(width=.1, height=0),aes(color=Genotype),siz
 pdf("16sDataCleaner-Nicole/Results/Acropora_Notched_Genotype_DistanceToCentroid.pdf",width=11,height=11)
 plot(p3)
 dev.off()
-#END#
+#E#################### END ##########################
