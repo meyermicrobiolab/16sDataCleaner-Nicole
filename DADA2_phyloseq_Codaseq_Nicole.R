@@ -130,42 +130,41 @@ ps <- phyloseq(otu_table(otu, taxa_are_rows=FALSE),
 ps
 
 #remove chloroplasts and mitochondria and Eukaryota
-get_taxa_unique(ps, "Family") #559
-get_taxa_unique(ps, "Order") #331
+get_taxa_unique(ps, "Family") #564
+get_taxa_unique(ps, "Order") #334
 get_taxa_unique(ps, "Kingdom") #4
 ps <- subset_taxa(ps, Family !="Mitochondria")
 ps <- subset_taxa(ps, Order !="Chloroplast")
 ps <- subset_taxa(ps, Kingdom !="Eukaryota")
 ps <- subset_taxa(ps, Kingdom !="NA")
-get_taxa_unique(ps, "Family") #555
-get_taxa_unique(ps, "Order") #327
+get_taxa_unique(ps, "Family") #560
+get_taxa_unique(ps, "Order") #331
 get_taxa_unique(ps, "Kingdom") #2
-ps
+ps #10150 taxa and 81 samples
 
 # Export otu and taxa tables from phyloseq
-otu = as(otu_table(ps2), "matrix")
-taxon = as(tax_table(ps2), "matrix")
-metadata = as(sample_data(ps2), "matrix")
-write.table(otu,"16sDataCleaner-Nicole/Acropora_silva_nochloronomito_otu_table.txt",sep="\t",col.names=NA)
-write.table(taxon,"16sDataCleaner-Nicole/Acropora_silva_nochloronomito_taxa_table.txt",sep="\t",col.names=NA)
+otu = as(otu_table(ps), "matrix")
+taxon = as(tax_table(ps), "matrix")
+metadata = as(sample_data(ps), "matrix")
+write.table(otu,"silva_nochloronomito_otu_table.txt",sep="\t",col.names=NA)
+write.table(taxon,"silva_nochloronomito_taxa_table.txt",sep="\t",col.names=NA)
 
 # Chose filtering method for very low abundance ASVs
-ntaxa(ps) #11078
-ps10<-filter_taxa(ps, function(x) mean(x) >10, TRUE)
-ntaxa(ps10) #265
+ntaxa(ps) #10150
 ps5<-filter_taxa(ps, function(x) mean(x) >5, TRUE)
-ntaxa(ps5) #453
-get_taxa_unique(ps, "Genus") # 1096
-get_taxa_unique(ps5, "Genus") #139
+ntaxa(ps5) #372
+ps10<-filter_taxa(ps, function(x) mean(x) >10, TRUE)
+ntaxa(ps10) #235
+get_taxa_unique(ps, "Genus") # 1097
+get_taxa_unique(ps5, "Genus") #134
 get_taxa_unique(ps10, "Genus") #93
 
 # Export otu and taxa tables from phyloseq for codaseq
 otu = as(otu_table(ps5), "matrix")
 taxon = as(tax_table(ps5), "matrix")
-metadata = as(sample_data(ps5), "matrix")
-write.table(otu,"16sDataCleaner-Nicole/Acropora_ps5_silva_nochloronomito_otu_table.txt",sep="\t",col.names=NA)
-write.table(taxon,"16sDataCleaner-Nicole/Acropora_ps5_silva_nochloronomito_taxa_table.txt",sep="\t",col.names=NA)
-write.table(metadata,"16sDataCleaner-Nicole/Acropora_ps5_silva_metadata.txt",sep="\t",col.names=NA)
+write.table(otu,"ps5_silva_nochloronomito_otu_table.txt",sep="\t",col.names=NA)
+write.table(taxon,"ps5_silva_nochloronomito_taxa_table.txt",sep="\t",col.names=NA)
+
 
 
 ######################CREATING COMMUNITY COMPOSITION BAR CHARTS##########################################################
