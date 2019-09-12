@@ -1,29 +1,36 @@
-source('16sDataCleaner-Nicole/createPS.R')
 library(dada2)
 library(ShortRead)
 library(ggplot2)
 library(phyloseq)
 library(vegan)
+library(knitr)
+library(ALDEx2)
+library(CoDaSeq)
+library(zCompositions)
+library(igraph)
+library(car)
+library(grDevices)
+library(propr)
+library(cowplot)
 library(randomcoloR)
-
-try(dir.create("/16sDataCleaner-Nicole/Results"))#Add file for figures and results to be added to for organizational purposes
-
-
+library(DESeq2)
+library(dplyr)
+library(reshape2)
+library(tibble)
+writeLines(capture.output(sessionInfo()), "sessionInfo.txt")
 
 #######################FILTERING THE DATA###################################################################
 
-path <- "16sDataCleaner-Nicole/Data"
+### adjust path name as appropriate to directory with sequencing reads with Illumina adaptors and primers removed
+path <- "~/Documents/NurseryAcropora/cutadapt/"
 list.files(path)
 
-# Samplename is everything before the first underscore
+# Samplename is everything before the first underscore, adjust pattern in suffix below as appropriate
 fnFs <- sort(list.files(path, pattern="_R1_cut.fastq.gz", full.names = TRUE))
 fnRs <- sort(list.files(path, pattern="_R2_cut.fastq.gz", full.names = TRUE))
 
-# Extract sample names, assuming filenames have format: SAMPLENAME_XXX.fastq
+# Extract sample names, assuming filenames have format: SAMPLENAME_*.fastq
 sample.names <- sapply(strsplit(basename(fnFs), "_"), `[`, 1)
-
-##Examine quality profiles of forward and reverse reads
-plotQualityProfile(fnFs[1:6])
 
 #Perform filtering and trimming
 #Assign the filenames for the filtered fastq.gz files.
@@ -33,7 +40,7 @@ filtFs <- file.path(filt_path, paste0(sample.names, "_F_filt.fastq.gz"))
 filtRs <- file.path(filt_path, paste0(sample.names, "_R_filt.fastq.gz"))
 
 # Filter the forward and reverse reads
-#WINDOWS USERS: set multithread=FALSE
+# WINDOWS USERS: set multithread=FALSE
 out <- filterAndTrim(fnFs, filtFs, fnRs, filtRs, truncLen=c(150,150),
               maxN=0, maxEE=c(2,2), truncQ=2, rm.phix=TRUE,
               compress=TRUE, multithread=TRUE) 
@@ -80,54 +87,60 @@ dim(seqtab.nochim)
 sum(seqtab.nochim)/sum(seqtab)
 
 #Track reads through the pipeline
-#As a final check of our progress, we’ll look at the number of reads that made it through each step in the pipeline
 getN <- function(x) sum(getUniques(x))
 track <- cbind(out, sapply(dadaFs, getN), sapply(mergers, getN), rowSums(seqtab), rowSums(seqtab.nochim))
 colnames(track) <- c("input", "filtered", "denoised", "merged", "tabled", "nonchim")
 rownames(track) <- sample.names
 head(track)
-write.table(track, "16sDataCleaner-Nicole/dada_read_stats.txt",sep="\t",col.names=NA)  
+write.table(track, "dada_read_stats.txt",sep="\t",col.names=NA)  
 
-#####SAVE THIS FILE SO YOU DON'T HAVE TO REPEAT ALL OF THE ABOVE STEPS, adjust name
-saveRDS(seqtab.nochim, file="16sDataCleaner-Nicole/seqtab.nochim.rds")
-
+#####SAVE THIS FILE SO YOU DON'T HAVE TO REPEAT ALL OF THE ABOVE STEPS
+saveRDS(seqtab.nochim, file="seqtab.nochim.rds")
 
 
 ######################ASSIGNING THE TAXONOMY###############################################################################
 # RELOAD THE SAVED INFO FROM HERE (if you have closed the project):
-seqtab.nochim <- readRDS("16sDataCleaner-Nicole/seqtab.nochim.rds")
+seqtab.nochim <- readRDS("seqtab.nochim.rds")
 
-#Make sure the appropriate database is available in the DADA2 directory
-taxa <- assignTaxonomy(seqtab.nochim, "16sDataCleaner-Nicole/silva_nr_v132_train_set.fa.gz", multithread=TRUE)
+# Make sure the appropriate database is available in the directory with the R project
+taxa <- assignTaxonomy(seqtab.nochim, "silva_nr_v132_train_set.fa.gz", multithread=TRUE)
 
-#### FIX the NAs in the taxa table (I'm writing it out here, then reading back in for phyloseq)
+#### FIX the NAs in the taxa table
 taxon <- as.data.frame(taxa,stringsAsFactors=FALSE)
 taxon$Phylum[is.na(taxon$Phylum)] <- taxon$Kingdom[is.na(taxon$Phylum)]
 taxon$Class[is.na(taxon$Class)] <- taxon$Phylum[is.na(taxon$Class)]
 taxon$Order[is.na(taxon$Order)] <- taxon$Class[is.na(taxon$Order)]
 taxon$Family[is.na(taxon$Family)] <- taxon$Order[is.na(taxon$Family)]
 taxon$Genus[is.na(taxon$Genus)] <- taxon$Family[is.na(taxon$Genus)]
-write.table(taxon,"16sDataCleaner-Nicole/Acropora_silva_taxa_table.txt",sep="\t",col.names=NA)
-write.table(seqtab.nochim, "16sDataCleaner-Nicole/Acropora_silva_otu_table.txt",sep="\t",col.names=NA)
+write.table(taxon,"silva_taxa_table.txt",sep="\t",col.names=NA)
+write.table(seqtab.nochim, "silva_otu_table.txt",sep="\t",col.names=NA)
 
 #####################REMOVING MITOCHONDIRAL AND CHLOROPLAST READS############################################################
-#####read in otu and taxonomy tables from dada2, sample data.
-ps = createPsObject("Acropora_silva_otu_table.txt",
-						   "Acropora_silva_taxa_table.txt",
-						   "16sDataCleaner-Nicole/Acropora_metadata.txt")
+# Create phyloseq object from otu and taxonomy tables from dada2, along with the sample metadata.
+otu <- read.table("silva_otu_table.txt",sep="\t",header=TRUE, row.names=1)
+taxon <- read.table("silva_taxa_table.txt",sep="\t",header=TRUE,row.names=1)
+samples<-read.table("metadata.txt",sep="\t",header=T,row.names=1)
+OTU = otu_table(otu, taxa_are_rows=FALSE)
+taxon<-as.matrix(taxon)
+TAX = tax_table(taxon)
+sampledata = sample_data(samples)
+ps <- phyloseq(otu_table(otu, taxa_are_rows=FALSE), 
+               sample_data(samples), 
+               tax_table(taxon))
 ps
+
 #remove chloroplasts and mitochondria and Eukaryota
 get_taxa_unique(ps, "Family") #559
 get_taxa_unique(ps, "Order") #331
 get_taxa_unique(ps, "Kingdom") #4
-ps2 <- subset_taxa(ps, Family !="Mitochondria")
-ps2 <- subset_taxa(ps2, Order !="Chloroplast")
-ps2 <- subset_taxa(ps2, Kingdom !="Eukaryota")
-ps2 <- subset_taxa(ps2, Kingdom !="NA")
-get_taxa_unique(ps2, "Family") #555
-get_taxa_unique(ps2, "Order") #327
-get_taxa_unique(ps2, "Kingdom") #2
-ps2
+ps <- subset_taxa(ps, Family !="Mitochondria")
+ps <- subset_taxa(ps, Order !="Chloroplast")
+ps <- subset_taxa(ps, Kingdom !="Eukaryota")
+ps <- subset_taxa(ps, Kingdom !="NA")
+get_taxa_unique(ps, "Family") #555
+get_taxa_unique(ps, "Order") #327
+get_taxa_unique(ps, "Kingdom") #2
+ps
 
 # Export otu and taxa tables from phyloseq
 otu = as(otu_table(ps2), "matrix")
