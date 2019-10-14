@@ -1,6 +1,6 @@
 ## Microbiome analysis (V4 region of 16S rRNA gene) of Caribbean nursery-reared <i>Acropora cervicornis</i> 
 
-### Required Packages
+### Essential Packages, see complete list in R script
 * [dada2](https://bioconductor.org/packages/release/bioc/html/dada2.html)
 * [phyloseq](https://joey711.github.io/phyloseq/) 
 * [vegan](https://cran.r-project.org/package=vegan)
