@@ -193,7 +193,7 @@ summary(d.pcx)
 str(d.pcx)
 screeplot(d.pcx)
 
-######### FIGURE 2 ###############################################################
+######### FIGURE 2 PCA ######################################################################################################
 # replot PCA with ggplot2 (showing samples only)
 df_out <- as.data.frame(d.pcx$x)
 theme_set(theme_bw()+theme(panel.grid.major = element_blank(),panel.grid.minor = element_blank()))
@@ -236,7 +236,7 @@ dev.off()
 perm<-adonis(dist.clr~genotype*colony,as(sample_data(ps5),"data.frame"))
 print(perm)
 
-############ Figure 3 Stacked bar charts
+############ FIGURE 3 Stacked bar charts of bacterial orders ################################################################
 ps_ra<-transform_sample_counts(ps5, function(OTU) OTU/sum(OTU))
 #figure out how many colors you need
 get_taxa_unique(ps_ra, "Class") #26
@@ -310,7 +310,7 @@ p3=plot_bar(ps_ra_yellow, fill="Order")+
 p3
 dev.off()
 
-########################### MD3-55 ASVs
+########################### FIGURE 4 - MD3-55 ASVs #########################################################################
 
 rick<-subset_taxa(ps_ra, Genus=="MD3-55")
 rick
@@ -346,7 +346,7 @@ p1
 dev.off()
 
 
-################################# ANCOM TEST OF DIFFERENTIALLY ABUNDANT FAMILIES
+################################# ANCOM TEST OF DIFFERENTIALLY ABUNDANT FAMILIES ############################################
 #ANCOM Function - compare across multiple treatments groups using a compositional appproach
 #https://sites.google.com/site/siddharthamandal1985/research
 
@@ -641,7 +641,7 @@ sum_sig <- Rmisc::summarySE(sig_long, measurevar = "Proportion", groupvars = c("
 cols<-c("G"="#009E73","R"="#D55E00","Y"="#F0E442")
 sum_sig$Genotype<-factor(sum_sig$Genotype, levels=c("G","R","Y"))
 
-############ Figure 4 Differentially abundant families by coral genotype 
+############ FIGURE 5 Differentially abundant families by coral genotype #####################################################
 pdf("ANCOM_Families_Genotype.pdf",width=8.5)
 fams <- ggplot(sum_sig, aes(x=Family, y=Proportion+0.001))+
   geom_point(size=4, aes(fill=Genotype,shape=Genotype))+
