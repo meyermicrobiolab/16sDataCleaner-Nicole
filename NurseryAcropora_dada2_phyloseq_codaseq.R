@@ -641,6 +641,7 @@ sum_sig <- Rmisc::summarySE(sig_long, measurevar = "Proportion", groupvars = c("
 cols<-c("G"="#009E73","R"="#D55E00","Y"="#F0E442")
 sum_sig$Genotype<-factor(sum_sig$Genotype, levels=c("G","R","Y"))
 
+############ Figure 4 Differentially abundant families by coral genotype 
 pdf("ANCOM_Families_Genotype.pdf",width=8.5)
 fams <- ggplot(sum_sig, aes(x=Family, y=Proportion+0.001))+
   geom_point(size=4, aes(fill=Genotype,shape=Genotype))+
