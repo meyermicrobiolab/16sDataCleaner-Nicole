@@ -338,8 +338,7 @@ p1<-ggplot(otu_long, aes(x=Sample,y=Proportion))+
   geom_bar(aes(fill=ASV), color="#333333", stat="identity",position="stack")+
   facet_grid(.~Genotype,scales="free",space="free")+
   theme(strip.text=element_text(face="bold"))+
-  #theme(axis.title.x=element_blank())+
-  theme(axis.text.x=element_blank())+
+  theme(axis.text.x=element_text(angle = 90, size=8))+
   theme(legend.title=element_blank())+
   theme(text=element_text(size=14))+
   scale_fill_manual(values=cols2)
@@ -557,7 +556,7 @@ ps <- phyloseq(otu_table(otu, taxa_are_rows=FALSE),
                sample_data(samples), 
                tax_table(taxon))
 ps
-#11332 taxa and 65 samples
+#10150 taxa and 81 samples
 get_taxa_unique(ps, "Family") #557
 
 
@@ -628,13 +627,14 @@ res4 <- res[which(res3$detected_0.7==TRUE),]
 
 sig_sites <- glue::glue_collapse(droplevels(factor(res2$otu.names)), sep = ", ") #this is to get a list of the families that are different
 print(sig_sites)
-#Rickettsiales, Alphaproteobacteria, Desulfobacteraceae, Francisellaceae, JGI_0000069.P22, Pirellulaceae, Pseudomonadaceae, Halomonadaceae, Woesearchaeia, Clade_III, S25.593, Marinimicrobia_.SAR406_clade., Alteromonadaceae, Puniceicoccaceae, Fusobacteriaceae, Xenococcaceae, Flammeovirgaceae, Thermoanaerobaculaceae, Phycisphaeraceae
+#Alphaproteobacteria, Francisellaceae, Desulfobacteraceae, JGI_0000069.P22, Pirellulaceae, Pseudomonadaceae, Halomonadaceae, Woesearchaeia, Alteromonadaceae, Clade_III, Marinimicrobia_.SAR406_clade., Puniceicoccaceae, S25.593, Fusobacteriaceae, Xenococcaceae, Phycisphaeraceae, PB19
+
 #Calculate relative abundance
 datc_relabund <-  sweep(datc[,4:560], 1, rowSums(datc[,4:560]), '/')
 datc_relnames <- cbind(datc[,1:3],datc_relabund)
 
 #only selet the significant families
-sig_dis <- select(datc_relnames, Sample, Genotype, Colony, Rickettsiales, Alphaproteobacteria, Desulfobacteraceae, Francisellaceae, "JGI_0000069-P22", Pirellulaceae, Pseudomonadaceae, Halomonadaceae, Woesearchaeia, Clade_III, "S25-593", "Marinimicrobia_(SAR406_clade)", Alteromonadaceae, Puniceicoccaceae, Fusobacteriaceae, Xenococcaceae, Flammeovirgaceae, Thermoanaerobaculaceae, Phycisphaeraceae)
+sig_dis <- select(datc_relnames, Sample, Genotype, Colony, Alphaproteobacteria, Francisellaceae, Desulfobacteraceae, "JGI_0000069-P22", Pirellulaceae, Pseudomonadaceae, Halomonadaceae, Woesearchaeia, Clade_III, "Marinimicrobia_(SAR406_clade)", Puniceicoccaceae, "S25-593", Fusobacteriaceae, Xenococcaceae, Phycisphaeraceae, PB19)
 sig_long <- melt(sig_dis, id.vars=c("Sample","Genotype","Colony"),variable.name="Family",value.name="Proportion")
 sum_sig <- Rmisc::summarySE(sig_long, measurevar = "Proportion", groupvars = c("Genotype","Family"), na.rm=TRUE)
 
