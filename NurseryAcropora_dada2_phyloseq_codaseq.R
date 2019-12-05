@@ -558,13 +558,10 @@ ps
 #10150 taxa and 81 samples
 get_taxa_unique(ps, "Family") #557
 
-
-#Need to run ANCOM function first
-#ANCOM
-#from phyloseq -use all of the data, not relative abundance, and  not filtered beyond mitochondria and choloroplasts 
+#Need to run ANCOM function first (lines 348 -543)
+#from phyloseq -use all of the data, not relative abundance, and not filtered beyond mitochondria and choloroplasts 
 #Make the otutable
 #group the otus based on family
-#this is probaby a little overkill, but it's how I've done it in the past - all you need is the otutable really, so probably that could have been done in one step, but i like this for future plot-making
 dat <- tax_glom(ps, taxrank = "Family") #at the Family level
 
 #melt the data, so it's like a dataframe
@@ -574,7 +571,7 @@ datm <- psmelt(dat)
 datc <- data.table::dcast(datm, Sample + Genotype + Colony ~ Family, value.var = 'Abundance', fun.aggregate = sum)
 
 dim(datc) #dimensions of the table
-
+#adjust column selection in line 575 according to number of families (557 families plus three columns of metadata=560)
 otud <- datc[,c(1,4:560)] #select the first column, and then all of the taxa columns  
 colnames(otud)[1] <- "Sample.ID" #rename the first column to Sample.ID - this is to match ANCOM syntax
 
