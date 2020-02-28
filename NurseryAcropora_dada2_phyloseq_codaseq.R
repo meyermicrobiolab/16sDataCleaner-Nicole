@@ -338,7 +338,7 @@ p1<-ggplot(otu_long, aes(x=Sample,y=Proportion))+
   geom_bar(aes(fill=ASV), color="#333333", stat="identity",position="stack")+
   facet_grid(.~Genotype,scales="free",space="free")+
   theme(strip.text=element_text(face="bold"))+
-  theme(axis.text.x=element_text(angle = 90, size=8))+
+  theme(axis.text.x=element_text(angle = 90, size=7))+
   theme(legend.title=element_blank())+
   theme(text=element_text(size=14))+
   scale_fill_manual(values=cols2)
