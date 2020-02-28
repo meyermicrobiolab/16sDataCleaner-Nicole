@@ -329,6 +329,7 @@ names(otu.rick)[6]<-"ASV5"
 meta.rick<-as.data.frame(meta.rick)
 meta.rick<-rownames_to_column(meta.rick,var="Sample")
 otu.rick.meta<-merge(meta.rick,otu.rick,"Sample")
+otu.rick.meta$Sample<-sub("D","R",otu.rick.meta$Sample)
 otu_long<-melt(otu.rick.meta,id.vars=c("Sample","Genotype","Colony","Branch"),variable.name="ASV",value.name="Proportion")
 cols2<-c("ASV1"="#56B4E9","ASV2"="#0072B2","ASV3"="#999999","ASV4"="#E69F00","ASV5"="#009E73")
 
