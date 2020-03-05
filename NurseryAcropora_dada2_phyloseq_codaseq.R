@@ -23,7 +23,7 @@ library(data.table)
 library(scales)
 writeLines(capture.output(sessionInfo()), "sessionInfo.txt")
 
-###### Quality-filter reads and create Amplicon Sequence Variant tables
+###################### Quality-filter reads and create Amplicon Sequence Variant tables 
 
 ###adjust path name as appropriate
 path <- "~/Documents/NurseryAcropora/cutadapt/"
@@ -103,7 +103,8 @@ saveRDS(seqtab.nochim, file="~/Documents/NurseryAcropora/seqtab.nochim.rds")
 # RELOAD THE SAVED INFO FROM HERE (if you have closed the project):
 # seqtab.nochim <- readRDS("~/Documents/NurseryAcropora/seqtab.nochim.rds")
 
-######################ASSIGNING THE TAXONOMY###############################################################################
+###################### ASSIGNING THE TAXONOMY
+
 # Make sure the appropriate database is available in the DADA2 directory
 taxa <- assignTaxonomy(seqtab.nochim, "~/Documents/NurseryAcropora/silva_nr_v132_train_set.fa.gz", multithread=TRUE)
 
@@ -117,7 +118,8 @@ taxon$Genus[is.na(taxon$Genus)] <- taxon$Family[is.na(taxon$Genus)]
 write.table(taxon,"silva_taxa_table.txt",sep="\t",col.names=NA)
 write.table(seqtab.nochim, "silva_otu_table.txt",sep="\t",col.names=NA)
 
-#####################REMOVING MITOCHONDIRAL AND CHLOROPLAST READS############################################################
+##################### REMOVING MITOCHONDIRAL AND CHLOROPLAST READS
+
 # Create phyloseq object from otu and taxonomy tables from dada2, along with the sample metadata.
 otu <- read.table("silva_otu_table.txt",sep="\t",header=TRUE, row.names=1)
 taxon <- read.table("silva_taxa_table.txt",sep="\t",header=TRUE,row.names=1)
@@ -167,7 +169,8 @@ taxon = as(tax_table(ps5), "matrix")
 write.table(otu,"ps5_silva_nochloronomito_otu_table.txt",sep="\t",col.names=NA)
 write.table(taxon,"ps5_silva_nochloronomito_taxa_table.txt",sep="\t",col.names=NA)
 
-######### Perform center-log-ratio transformation on ASVs and calculate Aitchison Distance and principal components
+###################### Perform center-log-ratio transformation on ASVs and calculate Aitchison Distance and principal components
+                  
 # READ IN OTU data that has been filtered for very low abundance sequences; do not clear data here. Keep phyloseq object ps5 for anosim/permanova
 otu <- read.table("ps5_silva_nochloronomito_otu_table.txt",sep="\t",header=TRUE, row.names=1)
 taxon <- read.table("ps5_silva_nochloronomito_taxa_table.txt",sep="\t",header=TRUE,row.names=1)
@@ -192,7 +195,8 @@ summary(d.pcx)
 str(d.pcx)
 screeplot(d.pcx)
 
-######### FIGURE 2 PCA ######################################################################################################
+###################### FIGURE 2 PCA 
+                  
 # replot PCA with ggplot2 (showing samples only)
 df_out <- as.data.frame(d.pcx$x)
 theme_set(theme_bw()+theme(panel.grid.major = element_blank(),panel.grid.minor = element_blank()))
@@ -207,7 +211,8 @@ p<-p+geom_point(size=3)+theme(axis.title = element_text(size=14))+theme(axis.tex
 p + labs(x=xlab, y=ylab, fill="Genotype", shape="Branch") + coord_fixed()
 dev.off()
 
-####### Use phyloseq/vegan to perform ANOSIM/PERMANOVA
+###################### Use phyloseq/vegan to perform ANOSIM/PERMANOVA
+                  
 # set metadata as factors for anosim
 genotype<-as.character(samples$Genotype)
 branch<-as.character(samples$Branch)
@@ -235,7 +240,8 @@ dev.off()
 perm<-adonis(dist.clr~genotype*colony,as(sample_data(ps5),"data.frame"))
 print(perm)
 
-############ FIGURE 3 Stacked bar charts of bacterial orders ################################################################
+###################### FIGURE 3 Stacked bar charts of bacterial orders 
+                  
 ps_ra<-transform_sample_counts(ps5, function(OTU) OTU/sum(OTU))
 #figure out how many colors you need
 get_taxa_unique(ps_ra, "Class") #26
@@ -288,11 +294,11 @@ p3=plot_bar(ps_ra_yellow, fill="Order")+
   theme(axis.title.x = element_blank())+
   theme(legend.position = "none")
 
-####adjust width and height until it looks right for double columns
+#adjust width and height until it looks right for double columns
 pdf("Acropora_BarCharts_Order5.pdf",width=24, height=10)
 plot_grid(p1,p2,p3,labels=c("A","B","C"), ncol=2, nrow=2)
 dev.off()
-### additional edits performed in inkscape: designation of colonies on x-axis and manually adding legend in bottom right
+# additional edits performed in inkscape: designation of colonies on x-axis and manually adding legend in bottom right
 # to get legend, plot p3 and change legend.position to right
 
 pdf("for_the_legend5.pdf",width=24)
@@ -309,7 +315,7 @@ p3=plot_bar(ps_ra_yellow, fill="Order")+
 p3
 dev.off()
 
-########################### FIGURE 4 - MD3-55 ASVs #########################################################################
+###################### FIGURE 4 - MD3-55 ASVs 
 
 rick<-subset_taxa(ps_ra, Genus=="MD3-55")
 rick
@@ -346,11 +352,11 @@ p1
 dev.off()
 
 
-################################# ANCOM TEST OF DIFFERENTIALLY ABUNDANT FAMILIES ############################################
+###################### ANCOM TEST OF DIFFERENTIALLY ABUNDANT FAMILIES 
 #ANCOM Function - compare across multiple treatments groups using a compositional appproach
 #https://sites.google.com/site/siddharthamandal1985/research
 
-###Need to run this first in order to run ANCOM on data
+#Need to run this first in order to run ANCOM on data
 ancom.W = function(otu_data,var_data,
                    adjusted,repeated,
                    main.var,adj.formula,
@@ -544,7 +550,8 @@ ANCOM.main = function(OTUdat,Vardat,
 }
 
 
-#####ANCOM results
+###################### ANCOM results
+    
 otu <- read.table("silva_nochloronomito_otu_table.txt",sep="\t",header=TRUE, row.names=1)
 taxon <- read.table("silva_nochloronomito_taxa_table.txt",sep="\t",header=TRUE,row.names=1)
 samples<-read.table("metadata.txt",sep="\t",header=T,row.names=1)
@@ -638,7 +645,8 @@ sum_sig <- Rmisc::summarySE(sig_long, measurevar = "Proportion", groupvars = c("
 cols<-c("G"="#009E73","R"="#D55E00","Y"="#F0E442")
 sum_sig$Genotype<-factor(sum_sig$Genotype, levels=c("G","R","Y"))
 
-############ FIGURE 5 Differentially abundant families by coral genotype #####################################################
+###################### FIGURE 5 Differentially abundant families by coral genotype 
+  
 pdf("ANCOM_Families_Genotype.pdf",width=8.5)
 fams <- ggplot(sum_sig, aes(x=Family, y=Proportion+0.001))+
   geom_point(size=4, aes(fill=Genotype,shape=Genotype))+
