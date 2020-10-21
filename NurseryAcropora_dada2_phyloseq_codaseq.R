@@ -612,7 +612,7 @@ res <- comparison_test_treat$W.taxa #taxa that significantly vary across factor 
 write.table(res,"ANCOM_family_KruskallWallis_Genotype.txt",sep="\t",col.names=NA)
 res2 <- res[which(res$detected_0.7==TRUE),] 
 
-#### ANCOM test - Adjusted by Coral species, ANOVA
+#### ANCOM test - Adjusted by Coral colony, ANOVA
 comparison_test_treat=ANCOM.main(OTUdat=otu_test, #calling the OTU table
                                  Vardat=map_test, #calling the metadata
                                  adjusted=TRUE, #true if covariates are to be included for adjustment
